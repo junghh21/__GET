@@ -136,6 +136,7 @@ if __name__ == "__main__":
   schedule.every().day.at("00:00").do(job_0600)
   schedule.every().day.at("06:00").do(job_0600)
   schedule.every().day.at("18:00").do(job_0600)
+  schedule.every(30).minutes.do(job_30min)
   while True:
     try:      
       current_time = datetime.now().time()
