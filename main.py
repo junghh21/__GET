@@ -53,6 +53,7 @@ def job_0600():
     one_month, intra = capture_element_screenshot(
       'https://www.cboe.com/tradable_products/vix/', 
       '//*[@id="charts-tile"]/div/div/div[2]/div[1]',
+      delay_wait=10,
       click='//*[@id="charts-tile"]/div/div/div[2]/div[2]/div[1]/div[1]')
     telegram_send_photo (one_month)
     telegram_send_photo (intra)
@@ -112,6 +113,7 @@ def job_30min():
     one_month, intra = capture_element_screenshot(
       'https://www.cboe.com/tradable_products/vix/', 
       '//*[@id="charts-tile"]/div/div/div[2]/div[1]',
+      delay_wait=10,
       click='//*[@id="charts-tile"]/div/div/div[2]/div[2]/div[1]/div[1]')
     telegram_send_photo (intra)
     #    
