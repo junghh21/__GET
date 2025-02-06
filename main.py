@@ -27,6 +27,15 @@ def job_0600():
       ['//*[@id="chart-layout-c-2"]'])
     telegram_send_photo (snp)
     #
+    sentiment_meter = capture_element_screenshot(
+      'https://www.hulltacticalfunds.com/market-sentiment-meter/', 
+      '//*[@id="__layout"]/div/div[2]/div[6]/div/div/div',
+      delay_wait=5)
+    canvas = Image.new('RGB', (sentiment_meter.size[0], sentiment_meter.size[1]), 'black')
+    canvas.paste(sentiment_meter, (0, 0))
+    sentiment_meter = sentiment_meter.resize((400, 200))
+    telegram_send_photo (sentiment_meter)
+    #
     market = capture_element_screenshot(
       'https://finance.yahoo.com/', 
       '//*[@id="nimbus-app"]/aside/section/div[1]/div/div[2]/ul/li[1]/div/div/section/ul')
@@ -72,6 +81,20 @@ def job_0600():
       '//*[@id="UpdatePanelChart"]',
       delay_wait=10)
     telegram_send_photo (ttf)
+    temp = capture_element_screenshot(
+      'https://natgasweather.com/', 
+      '//*[@id="post-2813"]/div/div/section[3]/div/div[2]/div/div[2]/div/img')
+    telegram_send_photo (temp)
+    power = capture_element_screenshot(
+      'https://poweroutage.us//', 
+      '//*[@id="ContinentalMap"]/div[2]/canvas',
+      delay_wait=5)
+    telegram_send_photo (power)
+    gen = capture_element_screenshot(
+      'https://www.eia.gov/electricity/gridmonitor/dashboard/daily_generation_mix/US48/US48/', 
+      '/html/body/div[1]/div[2]/div/app-root/app-dashboard/div/div/div/div[2]/app-grid/div[2]/div/div/gridster/gridster-item[1]/div/app-visualization',
+      delay_wait=5)
+    telegram_send_photo (gen)
     #
     summary, image = capture_with_summary("Gold",
       'https://tradingeconomics.com/commodity/gold',
@@ -130,14 +153,28 @@ def job_30min():
   except Exception as e:
     print(f"job_30min error: {e}")
 
+def job_1800():
+  current_time = datetime.now().time()
+  weekday = datetime.now().weekday()
+  if weekday == 5 or weekday == 6:
+    print("job_1800: Weekend")
+    return
+  try:      
+    print("job_1800")
+    job_0600()
+    telegram_send_message('https://www.eia.gov/naturalgas/storage/dashboard/')
+    telegram_send_message('https://www.eia.gov/naturalgas/weekly/')
+  except Exception as e:
+    print(f"job_1800 error: {e}")
+    
 #########################################################
 if __name__ == "__main__":
   job_30min()
-  job_0600()
+  job_1800()
   
   schedule.every().day.at("00:00").do(job_0600)
   schedule.every().day.at("06:00").do(job_0600)
-  schedule.every().day.at("18:00").do(job_0600)
+  schedule.every().day.at("18:00").do(job_1800)
   schedule.every(30).minutes.do(job_30min)
   while True:
     try:      
