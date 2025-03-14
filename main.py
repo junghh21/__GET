@@ -130,6 +130,7 @@ def job_30min():
     snp_fut = capture_element_screenshot(
       'https://www.tradingview.com/symbols/CME_MINI-ES1!/', 
       '//*[@id="js-category-content"]/div[2]/div/section/div[1]/div[2]/div/div[1]')
+    snp_fut = snp_fut.resize((snp_fut.width // 2, snp_fut.height))
     telegram_send_photo (snp_fut)
     #
     telegram_send_message('VIX')
@@ -149,6 +150,7 @@ def job_30min():
     ng_fut = capture_element_screenshot(
       'https://www.tradingview.com/symbols/NYMEX-NG1!/', 
       '//*[@id="js-category-content"]/div[2]/div/section/div[1]/div[2]/div/div[1]')
+    ng_fut = ng_fut.resize((ng_fut.width // 2, ng_fut.height))
     telegram_send_photo (ng_fut)
   except Exception as e:
     print(f"job_30min error: {e}")
