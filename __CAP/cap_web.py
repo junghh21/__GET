@@ -13,32 +13,64 @@ import time
 
 from __COMMON.telegram_req import telegram_send_photo
 
-def capture_element_screen_by_xpath (driver, xpath, output_file=None):
+def concat_images(image1, image2, hor=None):
+	if hor:
+		total_width = image1.width + image2.width
+		max_height = max(image1.height, image2.height)
+		new_image = Image.new('RGB', (total_width, max_height))
+		new_image.paste(image1, (0, 0))
+		new_image.paste(image2, (image1.width, 0))  
+	else:
+		total_height = image1.height + image2.height
+		max_width = max(image1.width, image2.width)					
+		new_image = Image.new('RGB', (max_width, total_height))
+		new_image.paste(image1, (0, 0))
+		new_image.paste(image2, (0, image1.height))		
+	return new_image
+
+def capture_element_screen_by_xpath (driver, xpath, xpath_iframe=None, output_file=None):
+  iframe_loc = None
   try:    
+    if xpath_iframe:
+      iframe = WebDriverWait(driver, 10).until(
+				EC.presence_of_element_located((By.XPATH, xpath_iframe))
+			)
+      iframe_loc = iframe.location
+      driver.switch_to.frame(iframe)
     element = WebDriverWait(driver, 10).until(
-		EC.presence_of_element_located((By.XPATH, xpath))
+      EC.presence_of_element_located((By.XPATH, xpath))
 		)
     driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", element)
     # Capture screenshot of the element's area
     location = element.location
     size = element.size
+    print(iframe_loc, location, size)
     png = driver.get_screenshot_as_png()
+    if xpath_iframe:
+      driver.switch_to.default_content()
 
     # Convert the screenshot to an image
     image = Image.open(io.BytesIO(png))
 
-    # Define the bounding box for the element
     left = location['x']
-    top = location['y'] - driver.execute_script('return window.pageYOffset')
-    right = location['x'] + size['width']
-    bottom = location['y'] - driver.execute_script('return window.pageYOffset') + size['height']
+    top = location['y']
+    right = location['x']
+    bottom = location['y']
+    if iframe_loc:
+      left += iframe_loc['x']
+      top += iframe_loc['y']
+      right += iframe_loc['x']
+      bottom += iframe_loc['y']
+    top -= driver.execute_script('return window.pageYOffset')
+    right += size['width']
+    bottom = bottom - driver.execute_script('return window.pageYOffset') + size['height']
 
     # Crop the image to the bounding box
     element_image = image.crop((left, top, right, bottom))
     if output_file:
       element_image.save(output_file)
   except:
-  	element_image = None
+    element_image = None
     
   return element_image
 
@@ -53,7 +85,7 @@ def summary_element_text_by_xpath (driver, xpath):
     summary = ''
   return summary
 
-def capture_element_screenshot(url, xpath, output_file=None, width=None,
+def capture_element_screenshot(url, xpath, popup=None, popup_button=None, xpath_iframe=None, output_file=None, width=None,
                                click=None, click_wait=10,
                                delay_wait=None):
     #'''
@@ -74,6 +106,16 @@ def capture_element_screenshot(url, xpath, output_file=None, width=None,
       xpath = [xpath]
     output = []
     
+    if popup:
+      element = WebDriverWait(driver, 10).until(
+        EC.presence_of_element_located((By.XPATH, popup))
+      )
+      actions = ActionChains(driver)
+      element = driver.find_element(By.XPATH, popup_button)
+      driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", element)
+      actions.click(element).perform()
+      time.sleep(2)
+    
     if click:
       for path in xpath:        
         element_image = capture_element_screen_by_xpath (driver, path)
@@ -87,9 +129,10 @@ def capture_element_screenshot(url, xpath, output_file=None, width=None,
       driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", element)
       actions.click(element).perform()
       time.sleep(click_wait)
-        
+  
+    
     for path in xpath:
-      element_image = capture_element_screen_by_xpath (driver, path)
+      element_image = capture_element_screen_by_xpath (driver, path, xpath_iframe=xpath_iframe)
       output.append(element_image)
       
     time.sleep(1)

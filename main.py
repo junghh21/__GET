@@ -7,7 +7,7 @@ import schedule
 import time
 from datetime import datetime
 
-from __CAP.cap_web import capture_element_screenshot, summary_element, capture_with_summary
+from __CAP.cap_web import capture_element_screenshot, summary_element, capture_with_summary, concat_images
 from __COMMON.telegram_req import telegram_send_photo, telegram_send_message
 from PIL import Image
 
@@ -22,10 +22,16 @@ def job_0600():
   try:    
     print("job_0600")
     #
-    snp = capture_element_screenshot(
-      'https://finviz.com', 
-      ['//*[@id="chart-layout-c-2"]'])
-    telegram_send_photo (snp)
+    ny_mkt, ny_chart, ny_top = capture_element_screenshot(
+		'https://www.nytimes.com/section/markets-overview', 
+		['//*[@id="app"]/div/div[2]', '//*[@id="app"]/div/div[3]', '//*[@id="app"]/div/div[5]'],
+		popup='//*[@id="complianceOverlay"]',
+		popup_button='//*[@id="complianceOverlay"]/div/div/button',
+		xpath_iframe = '//*[@id="site-content"]/iframe')
+    ny = concat_images(ny_mkt, ny_chart)
+    ny = concat_images(ny, ny_top)    
+    telegram_send_photo(ny)
+    
     #
     sentiment_meter = capture_element_screenshot(
       'https://www.hulltacticalfunds.com/market-sentiment-meter/', 
@@ -129,7 +135,7 @@ def job_30min():
     telegram_send_message('S&P Futures')
     snp_fut = capture_element_screenshot(
       'https://www.tradingview.com/symbols/CME_MINI-ES1!/', 
-      '//*[@id="js-category-content"]/div[2]/div/section/div[1]/div[2]/div/div[1]')
+      '//*[@id="symbol-overview-page-section"]/div/div/div[1]/div[2]/div/div[1]/div')
     snp_fut = snp_fut.resize((snp_fut.width // 2, snp_fut.height))
     telegram_send_photo (snp_fut)
     #
@@ -149,7 +155,7 @@ def job_30min():
     telegram_send_message('NG Futures')
     ng_fut = capture_element_screenshot(
       'https://www.tradingview.com/symbols/NYMEX-NG1!/', 
-      '//*[@id="js-category-content"]/div[2]/div/section/div[1]/div[2]/div/div[1]')
+      '//*[@id="symbol-overview-page-section"]/div/div/div[1]/div[2]/div/div[1]')
     ng_fut = ng_fut.resize((ng_fut.width // 2, ng_fut.height))
     telegram_send_photo (ng_fut)
   except Exception as e:
