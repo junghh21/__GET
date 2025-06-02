@@ -107,14 +107,18 @@ def capture_element_screenshot(url, xpath, popup=None, popup_button=None, xpath_
     output = []
     
     if popup:
-      element = WebDriverWait(driver, 10).until(
-        EC.presence_of_element_located((By.XPATH, popup))
-      )
-      actions = ActionChains(driver)
-      element = driver.find_element(By.XPATH, popup_button)
-      driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", element)
-      actions.click(element).perform()
-      time.sleep(2)
+      try:
+        element = WebDriverWait(driver, 10).until(
+          EC.presence_of_element_located((By.XPATH, popup))
+        )
+        actions = ActionChains(driver)
+        element = driver.find_element(By.XPATH, popup_button)
+        driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", element)
+        actions.click(element).perform()
+        time.sleep(2)
+      except:
+        pass
+
     
     if click:
       for path in xpath:        
