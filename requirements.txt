@@ -2,4 +2,3 @@ selenium
 requests
 Pillow
 schedule
-io
