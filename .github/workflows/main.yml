@@ -32,7 +32,7 @@ jobs:
     - name: Download Chrome Remote Desktop Host
       run: |
         Invoke-WebRequest -Uri "https://dl.google.com/edgedl/chrome-remote-desktop/chromeremotedesktophost.msi" -OutFile "chromeremotedesktophost.msi"
-        Start-Process msiexec.exe -ArgumentList '/i chromeremotedesktophost.msi 
+        Start-Process msiexec.exe -ArgumentList '/i chromeremotedesktophost.msi /quiet /norestart' -Wait
     - name: Setup Chrome Remote Desktop
       run: |
         & "${Env:PROGRAMFILES(X86)}\Google\Chrome Remote Desktop\CurrentVersion\remoting_start_host.exe" --code="4/0AVMBsJj5QwNpPK2MjuqVaa8RK6NFha1r2IWiJ5e4iCj-RBjMpzpgbi3XE-ecfhmCDK99ag" --redirect-url="https://remotedesktop.google.com/_/oauthredirect" --name=$Env:COMPUTERNAME
