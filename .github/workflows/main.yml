@@ -33,9 +33,9 @@ jobs:
       run: |
         Invoke-WebRequest -Uri "https://dl.google.com/edgedl/chrome-remote-desktop/chromeremotedesktophost.msi" -OutFile "chromeremotedesktophost.msi"
         Start-Process msiexec.exe -ArgumentList '/i chromeremotedesktophost.msi /quiet /norestart' -Wait
-    - name: Setup Chrome Remote Desktop
-      run: |
-        & "${Env:PROGRAMFILES(X86)}\Google\Chrome Remote Desktop\CurrentVersion\remoting_start_host.exe" --code="4/0AVMBsJi_fa1rqKG4RN9gqbUeci7OtkFiW2VMwgWMgmbWZ8SfISp_UWqjcLm_B1-u_hvUAA" --redirect-url="https://remotedesktop.google.com/_/oauthredirect" --name=$Env:COMPUTERNAME --pin=111111
+    #- name: Setup Chrome Remote Desktop
+    #  run: |
+    #    & "${Env:PROGRAMFILES(X86)}\Google\Chrome Remote Desktop\CurrentVersion\remoting_start_host.exe" --code="4/0AVMBsJi_fa1rqKG4RN9gqbUeci7OtkFiW2VMwgWMgmbWZ8SfISp_UWqjcLm_B1-u_hvUAA" --redirect-url="https://remotedesktop.google.com/_/oauthredirect" --name=$Env:COMPUTERNAME --pin=111111
     - name: Run tests
       run: |
         python main.py
