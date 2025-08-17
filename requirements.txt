@@ -2,3 +2,4 @@ selenium
 requests
 Pillow
 schedule
+g4f
