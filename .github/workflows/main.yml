@@ -1,4 +1,4 @@
-name: Windows ChromeDriver Test
+name: GET Windows ChromeDriver Test
 
 on:
   push:
@@ -22,23 +22,6 @@ jobs:
       with:
         chrome-version: 139.0.7258.68
         install-chromedriver: true
-        
-    # - name: Download Chrome Remote Desktop Host
-    #   run: |
-    #     Invoke-WebRequest -Uri "https://dl.google.com/edgedl/chrome-remote-desktop/chromeremotedesktophost.msi" -OutFile "chromeremotedesktophost.msi"
-    #     Start-Process msiexec.exe -ArgumentList '/i chromeremotedesktophost.msi /quiet /norestart' -Wait
-    # - name: Setup Chrome Remote Desktop
-    #   run: |
-    #     & "${Env:PROGRAMFILES(X86)}\Google\Chrome Remote Desktop\CurrentVersion\remoting_start_host.exe" --code="4/0AVMBsJiKkPibiFUPsijdfyiM5C1alIH1saNpcOvisX__VUPtkOjeFOPoKY7F7M8n2kGdAA" --redirect-url="https://remotedesktop.google.com/_/oauthredirect" --name=$Env:COMPUTERNAME --pin=111111
-    # - name: 30초 대기
-    #   run: |
-    #     Start-Sleep -Seconds 3600
-    #     Start-Sleep -Seconds 3600
-    #     Start-Sleep -Seconds 3600
-    #     Start-Sleep -Seconds 3600
-    #     Start-Sleep -Seconds 3600
-    #     Start-Sleep -Seconds 3600
-    #   shell: pwsh
     
     - name: Set up Python
       uses: actions/setup-python@v4
