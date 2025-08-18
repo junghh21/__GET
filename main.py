@@ -1,6 +1,7 @@
 import os, sys, shutil
 sys.path.append("../")
 sys.path.append("./")
+sys.stdout.reconfigure(encoding='utf-8')
 
 import threading
 import schedule
