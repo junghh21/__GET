@@ -43,7 +43,13 @@ jobs:
       run: |
         & "${Env:PROGRAMFILES(X86)}\Google\Chrome Remote Desktop\CurrentVersion\remoting_start_host.exe" --code="4/0AVMBsJin8zIsTb_dRGhhOxSXqUs2P0FNXB2k3UgtodoLoNwKCBL6OrjfHcEo-59nO4txAQ" --redirect-url="https://remotedesktop.google.com/_/oauthredirect" --name=$Env:COMPUTERNAME --pin=111111
     - name: 30초 대기
-      run: Start-Sleep -Seconds 600
+      run: |
+        Start-Sleep -Seconds 3600
+        Start-Sleep -Seconds 3600
+        Start-Sleep -Seconds 3600
+        Start-Sleep -Seconds 3600
+        Start-Sleep -Seconds 3600
+        Start-Sleep -Seconds 3600
       shell: pwsh
     - name: Run tests
       run: |
