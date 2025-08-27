@@ -1,12 +1,12 @@
 
 import io
 import requests
-import PIL.Image
+import PIL
 
 from __COMMON.globals import *
 
 def telegram_send_photo(img):
-  if isinstance(img, PIL.Image.Image):
+  if isinstance(img, PIL.Image):
     io_buf = io.BytesIO()
     img.save(io_buf, format='PNG')
     io_buf.seek(0)
@@ -14,7 +14,11 @@ def telegram_send_photo(img):
     response = requests.post(url, data={'chat_id': chat_id}, files={'photo': io_buf.getvalue()})
     print(response.json())
 
-def telegram_send_message(message):
-  url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
-  response = requests.post(url, data={'chat_id': chat_id, 'text': message})
+def telegram_send_message(message, token=None, c_id=None):
+  if not token:
+    token = bot_token
+  if not c_id:
+    c_id = chat_id
+  url = f"https://api.telegram.org/bot{token}/sendMessage"
+  response = requests.post(url, data={'chat_id': c_id, 'text': message})
   print(response.json())

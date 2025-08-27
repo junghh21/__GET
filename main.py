@@ -162,23 +162,74 @@ def job_30min():
 	except Exception as e:
 		print(f"job_30min error: {e}")
 
-def job_1800():
-	current_time = datetime.now().time()
-	weekday = datetime.now().weekday()
-	if weekday == 5 or weekday == 6:
-		print("job_1800: Weekend")
-		return
-	try:
-		print("job_1800")
-		job_0600()
-		telegram_send_message('https://www.eia.gov/naturalgas/storage/dashboard/')
-		telegram_send_message('https://www.eia.gov/naturalgas/weekly/')
-	except Exception as e:
-		print(f"job_1800 error: {e}")
+import requests
+import json
+from selectolax.parser import HTMLParser
+
+def job_coin():
+	W = "MdVtFbZSobabqiZL7P4Za4ZUZBWwm3VqSS"
+	# Connect to the SSE endpoint
+	response = requests.get("https://pool.rplant.xyz/api2/poolminer2/microbitcoin/MdVtFbZSobabqiZL7P4Za4ZUZBWwm3VqSS/TWRWdEZiWlNvYmFicWlaTDdQNFphNFpVWkJXd20zVnFTU3w=", stream=True)
+	for line in response.iter_lines():
+		if line:
+			decoded_line = line.decode("utf-8")
+			#print(decoded_line)
+			data = json.loads(decoded_line[6:])
+			if "miner" in data:
+				#print(data["miner"])
+				miner = json.loads(json.dumps(data["miner"], ensure_ascii=False))
+				#print(miner)
+				hr = miner["hr"]
+				paid = miner["paid"]
+				telegram_send_message (f"{W}:\n \t{hr}H/s ({paid:.0f})", "8490037832:AAHmmxVAkA5DqQjJno2O5Oqy2JEHgsDb9Dg", 1932486894)
+				break
+	
+	W = "bJzPjHhEwjLPeTJGwePQ4KpDxLH1vvZoy4"
+	html = requests.get(f"https://leywapool.com/site/wallet_miners_results?address={W}").text
+	tree = HTMLParser(html)
+	e_hr = tree.css_first("div > div > table > tbody > tr > td:nth-child(4) > b")
+	hr = float(e_hr.text().split()[0])
+	html = requests.get(f"https://leywapool.com/site/wallet_results?address={W}").text
+	tree = HTMLParser(html)
+	e_paid = tree.css_first("div > div > table > tbody > tr:nth-child(6) > td:nth-child(4) > a")
+	paid = float(e_paid.text()[:-5])
+	telegram_send_message (f"{W}:\n \t{hr} H/s ({paid:.0f})", "8490037832:AAHmmxVAkA5DqQjJno2O5Oqy2JEHgsDb9Dg", 1932486894)
+
+	html = requests.get(f"https://www.forbes.com/digital-assets/assets/microbitcoin-mbc/").text
+	tree = HTMLParser(html)
+
+	e_name1 = tree.css_first("body > div.main-content.main-content--universal-header.main-content--overflow-visible > main > div.profile-wrapper > div.profile-page-body > div.profile-content > div.profile-body-mobile > div > div.top-assets.fda-right-rail > div:nth-child(2) > div > div > div > div > a > div > span:nth-child(2)")
+	name1 = e_name1.text().upper()
+	e_price1 = tree.css_first("body > div.main-content.main-content--universal-header.main-content--overflow-visible > main > div.profile-wrapper > div.profile-page-body > div.profile-content > div.profile-body-mobile > div > div.top-assets.fda-right-rail > div:nth-child(2) > div > div > div > div > div > div")
+	price1 = e_price1.text()
+	e_name2 = tree.css_first("body > div.main-content.main-content--universal-header.main-content--overflow-visible > main > div.profile-wrapper > div.profile-page-body > div.profile-content > div.profile-body-mobile > div > div.top-assets.fda-right-rail > div:nth-child(3) > div > div > div > div > a > div > span:nth-child(2)")
+	name2 = e_name2.text().upper()
+	e_price2 = tree.css_first("body > div.main-content.main-content--universal-header.main-content--overflow-visible > main > div.profile-wrapper > div.profile-page-body > div.profile-content > div.profile-body-mobile > div > div.top-assets.fda-right-rail > div:nth-child(3) > div > div > div > div > div > div")
+	price2 = e_price2.text()
+	e_price = tree.css_first("#profile-header > section > div > div > div.header-number-info > span.header-rank")
+	price = e_price.text()
+	telegram_send_message (f"{name1}: {price1}", "8490037832:AAHmmxVAkA5DqQjJno2O5Oqy2JEHgsDb9Dg", 1932486894)
+	telegram_send_message (f"{name2}: {price2}", "8490037832:AAHmmxVAkA5DqQjJno2O5Oqy2JEHgsDb9Dg", 1932486894)
+	telegram_send_message (f"MBC: {price}", "8490037832:AAHmmxVAkA5DqQjJno2O5Oqy2JEHgsDb9Dg", 1932486894)
+
+# def job_1800():
+# 	current_time = datetime.now().time()
+# 	weekday = datetime.now().weekday()
+# 	if weekday == 5 or weekday == 6:
+# 		print("job_1800: Weekend")
+# 		return
+# 	try:
+# 		print("job_1800")
+# 		job_0600()
+# 		telegram_send_message('https://www.eia.gov/naturalgas/storage/dashboard/')
+# 		telegram_send_message('https://www.eia.gov/naturalgas/weekly/')
+# 	except Exception as e:
+# 		print(f"job_1800 error: {e}")
 
 #########################################################
 if __name__ == "__main__":
 	job_30min()
+	job_coin()
 	exit()
 	job_1800()
 
