@@ -1,12 +1,12 @@
 
 import io
 import requests
-import PIL
+from PIL import Image
 
 from __COMMON.globals import *
 
 def telegram_send_photo(img):
-  if isinstance(img, PIL.Image):
+  if isinstance(img, Image.Image):
     io_buf = io.BytesIO()
     img.save(io_buf, format='PNG')
     io_buf.seek(0)

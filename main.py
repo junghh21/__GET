@@ -228,8 +228,14 @@ def job_coin():
 
 #########################################################
 if __name__ == "__main__":
-	job_30min()
-	job_coin()
+	try:
+		job_30min()
+	except:	
+		pass
+	try:
+		job_coin()
+	except:
+		pass
 	exit()
 	job_1800()
 
