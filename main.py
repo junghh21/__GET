@@ -181,7 +181,7 @@ def job_coin():
 				#print(miner)
 				hr = miner["hr"]
 				paid = miner["paid"]
-				telegram_send_message (f"{W}:  {hr}H/s ({paid:.0f})", "8490037832:AAHmmxVAkA5DqQjJno2O5Oqy2JEHgsDb9Dg", 1932486894)
+				telegram_send_message (f"{W}:  {hr}H/s ({paid:.0f})", "8490037832:AAHmmxVAkA5DqQjJno2O5Oqy2JEHgsDb9Dg", -1003016231971)
 				break
 	
 	W = "bJzPjHhEwjLPeTJGwePQ4KpDxLH1vvZoy4"
@@ -193,7 +193,7 @@ def job_coin():
 	tree = HTMLParser(html)
 	e_paid = tree.css_first("div > div > table > tbody > tr:nth-child(6) > td:nth-child(4) > a")
 	paid = float(e_paid.text()[:-5])
-	telegram_send_message (f"{W}:  {hr} H/s ({paid:.0f})", "8490037832:AAHmmxVAkA5DqQjJno2O5Oqy2JEHgsDb9Dg", 1932486894)
+	telegram_send_message (f"{W}:  {hr} H/s ({paid:.0f})", "8490037832:AAHmmxVAkA5DqQjJno2O5Oqy2JEHgsDb9Dg", -1003016231971)
 
 	html = requests.get(f"https://www.forbes.com/digital-assets/assets/microbitcoin-mbc/").text
 	tree = HTMLParser(html)
@@ -208,9 +208,9 @@ def job_coin():
 	price2 = e_price2.text()
 	e_price = tree.css_first("#profile-header > section > div > div > div.header-number-info > span.header-rank")
 	price = e_price.text()
-	telegram_send_message (f"{name1}: {price1}", "8490037832:AAHmmxVAkA5DqQjJno2O5Oqy2JEHgsDb9Dg", 1932486894)
-	telegram_send_message (f"{name2}: {price2}", "8490037832:AAHmmxVAkA5DqQjJno2O5Oqy2JEHgsDb9Dg", 1932486894)
-	telegram_send_message (f"MBC: {price}", "8490037832:AAHmmxVAkA5DqQjJno2O5Oqy2JEHgsDb9Dg", 1932486894)
+	telegram_send_message (f"{name1}: {price1}", "8490037832:AAHmmxVAkA5DqQjJno2O5Oqy2JEHgsDb9Dg", -1003016231971)
+	telegram_send_message (f"{name2}: {price2}", "8490037832:AAHmmxVAkA5DqQjJno2O5Oqy2JEHgsDb9Dg", -1003016231971)
+	telegram_send_message (f"MBC: {price}", "8490037832:AAHmmxVAkA5DqQjJno2O5Oqy2JEHgsDb9Dg", -1003016231971)
 
 # def job_1800():
 # 	current_time = datetime.now().time()
