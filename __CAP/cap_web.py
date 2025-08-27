@@ -85,7 +85,8 @@ def summary_element_text_by_xpath (driver, xpath):
     summary = ''
   return summary
 
-def capture_element_screenshot(url, xpath, popup=None, popup_button=None, xpath_iframe=None, output_file=None, width=None,
+def capture_element_screenshot(url, xpath, popup=None, popup_button=None, 
+                               xpath_iframe=None, output_file=None, width=None,
                                click=None, click_wait=10,
                                delay_wait=None):
     #'''
