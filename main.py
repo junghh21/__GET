@@ -190,7 +190,10 @@ def job_coin():
 	html = requests.get(f"https://leywapool.com/site/wallet_miners_results?address={W}").text
 	tree = HTMLParser(html)
 	e_hr = tree.css_first("div > div > table > tbody > tr > td:nth-child(4) > b")
-	hr = float(e_hr.text().split()[0])
+	try:
+		hr = float(e_hr.text().split()[0])
+	except:
+		hr = 0
 	html = requests.get(f"https://leywapool.com/site/wallet_results?address={W}").text
 	tree = HTMLParser(html)
 	e_paid = tree.css_first("div > div > table > tbody > tr:nth-child(6) > td:nth-child(4) > a")
