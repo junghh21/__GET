@@ -2,7 +2,7 @@ name: Windows LONG Test
 
 on:
   workflow_dispatch:
-  push:  # 모든 브랜치에 푸시될 때 실행
+  #push:  # 모든 브랜치에 푸시될 때 실행
 
 jobs:
   test:
