@@ -183,26 +183,25 @@ def job_coin():
 				#print(miner)
 				hr = miner["hr"]
 				paid = miner["paid"]
-				telegram_send_message (f"{W}:  {hr}H/s ({paid:.0f})", "8490037832:AAHmmxVAkA5DqQjJno2O5Oqy2JEHgsDb9Dg", -1003016231971)
+				telegram_send_message (f"{W[-5:]}:  {hr}H/s ({paid:.0f})", "8490037832:AAHmmxVAkA5DqQjJno2O5Oqy2JEHgsDb9Dg", -1003016231971)
 				break
 	
-	W = "bJzPjHhEwjLPeTJGwePQ4KpDxLH1vvZoy4"
-	html = requests.get(f"https://leywapool.com/site/wallet_miners_results?address={W}").text
-	tree = HTMLParser(html)
-	e_hr = tree.css_first("div > div > table > tbody > tr > td:nth-child(4) > b")
-	try:
-		hr = float(e_hr.text().split()[0])
-	except:
-		hr = 0
-	html = requests.get(f"https://leywapool.com/site/wallet_results?address={W}").text
-	tree = HTMLParser(html)
-	e_paid = tree.css_first("div > div > table > tbody > tr:nth-child(6) > td:nth-child(4) > a")
-	paid = float(e_paid.text()[:-5])
-	telegram_send_message (f"{W}:  {hr} H/s ({paid:.0f})", "8490037832:AAHmmxVAkA5DqQjJno2O5Oqy2JEHgsDb9Dg", -1003016231971)
+	# W = "bJzPjHhEwjLPeTJGwePQ4KpDxLH1vvZoy4"
+	# html = requests.get(f"https://leywapool.com/site/wallet_miners_results?address={W}").text
+	# tree = HTMLParser(html)
+	# e_hr = tree.css_first("div > div > table > tbody > tr > td:nth-child(4) > b")
+	# try:
+	# 	hr = float(e_hr.text().split()[0])
+	# except:
+	# 	hr = 0
+	# html = requests.get(f"https://leywapool.com/site/wallet_results?address={W}").text
+	# tree = HTMLParser(html)
+	# e_paid = tree.css_first("div > div > table > tbody > tr:nth-child(6) > td:nth-child(4) > a")
+	# paid = float(e_paid.text()[:-5])
+	# telegram_send_message (f"{W}:  {hr} H/s ({paid:.0f})", "8490037832:AAHmmxVAkA5DqQjJno2O5Oqy2JEHgsDb9Dg", -1003016231971)
 
 	html = requests.get(f"https://www.forbes.com/digital-assets/assets/microbitcoin-mbc/").text
 	tree = HTMLParser(html)
-
 	e_name1 = tree.css_first("body > div.main-content.main-content--universal-header.main-content--overflow-visible > main > div.profile-wrapper > div.profile-page-body > div.profile-content > div.profile-body-mobile > div > div.top-assets.fda-right-rail > div:nth-child(2) > div > div > div > div > a > div > span:nth-child(2)")
 	name1 = e_name1.text().upper()
 	e_price1 = tree.css_first("body > div.main-content.main-content--universal-header.main-content--overflow-visible > main > div.profile-wrapper > div.profile-page-body > div.profile-content > div.profile-body-mobile > div > div.top-assets.fda-right-rail > div:nth-child(2) > div > div > div > div > div > div")
