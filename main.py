@@ -146,6 +146,7 @@ def job_30min():
 			'/html/body/main/div/div/section[1]/div/div[3]/div[2]/div[1]/div[1]/div',
 			delay_wait=10,
 			click='/html/body/main/div/div/section[1]/div/div[3]/div[2]/div[1]/div[2]/div/div/button[1]')
+		telegram_send_photo (one_month)
 		telegram_send_photo (intra)
 		#
 		term = capture_element_screenshot(
