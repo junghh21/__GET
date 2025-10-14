@@ -143,11 +143,9 @@ def job_30min():
 		telegram_send_message('VIX')
 		one_month, intra = capture_element_screenshot(
 			'https://www.cboe.com/tradable_products/vix/',
-			'//*[@id="charts-tile"]/div/div/div[2]/div[1]',
-			'//*[@id="onetrust-banner-sdk"]/div/div[1]',
-			'//*[@id="onetrust-accept-btn-handler"]',
+			'/html/body/main/div/div/section[1]/div/div[3]/div[2]/div[1]/div[1]/div',
 			delay_wait=10,
-			click='//*[@id="charts-tile"]/div/div/div[2]/div[2]/div[1]/div[1]')
+			click='/html/body/main/div/div/section[1]/div/div[3]/div[2]/div[1]/div[2]/div/div/button[1]')
 		telegram_send_photo (intra)
 		#
 		term = capture_element_screenshot(

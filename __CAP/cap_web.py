@@ -7,6 +7,8 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.action_chains import ActionChains
+from selenium.webdriver.chrome.options import Options
+
 from PIL import Image
 import io
 import time
@@ -41,6 +43,7 @@ def capture_element_screen_by_xpath (driver, xpath, xpath_iframe=None, output_fi
 			EC.presence_of_element_located((By.XPATH, xpath))
 		)
 		driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", element)
+		time.sleep(5)
 		# Capture screenshot of the element's area
 		location = element.location
 		size = element.size
@@ -66,6 +69,7 @@ def capture_element_screen_by_xpath (driver, xpath, xpath_iframe=None, output_fi
 		bottom = bottom - driver.execute_script('return window.pageYOffset') + size['height']
 
 		# Crop the image to the bounding box
+		print(f"Crop: {left=}, {top=}, {right=}, {bottom=}")
 		element_image = image.crop((left, top, right, bottom))
 		if output_file:
 			element_image.save(output_file)
@@ -86,11 +90,13 @@ def summary_element_text_by_xpath (driver, xpath):
 	return summary
 
 def capture_element_screenshot(url, xpath, popup=None, popup_button=None, 
-															 xpath_iframe=None, output_file=None, width=None,
-															 click=None, click_wait=10,
-															 delay_wait=None):
+															xpath_iframe=None, output_file=None, width=None,
+															click=None, click_wait=10,
+															delay_wait=None):
+		options = Options()
+		options.add_argument('--ignore-certificate-errors')		
 		#'''
-		driver = webdriver.Chrome()
+		driver = webdriver.Chrome(options=options)
 		'''
 		driver = webdriver.Edge()
 		'''
