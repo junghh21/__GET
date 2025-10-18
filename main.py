@@ -137,7 +137,7 @@ def job_30min():
 		snp_fut = capture_element_screenshot(
 			'https://www.tradingview.com/symbols/CME_MINI-ES1!/',
 			'//*[@id="symbol-overview-page-section"]/div/div/div[1]/div[2]/div/div[1]',
-			size_mod=(250, 110)
+			#size_mod=(250, 110)
 		)
 		snp_fut = snp_fut.resize((int(snp_fut.width), int(snp_fut.width*9/16)))
 		telegram_send_photo (snp_fut)
@@ -160,7 +160,7 @@ def job_30min():
 		ng_fut = capture_element_screenshot(
 			'https://www.tradingview.com/symbols/NYMEX-NG1!/',
 			'//*[@id="symbol-overview-page-section"]/div/div/div[1]/div[2]/div/div[1]',
-			size_mod=(250, 110)
+			#size_mod=(250, 110)
 		)
 		ng_fut = ng_fut.resize((int(ng_fut.width), int(ng_fut.width*9/16)))
 		telegram_send_photo (ng_fut)
