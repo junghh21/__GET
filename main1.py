@@ -16,9 +16,9 @@ from PIL import Image
 def job_0600():
 	current_time = datetime.now().time()
 	weekday = datetime.now().weekday()
-	if weekday == 5 or weekday == 6:
-		print("job_0600: Weekend")
-		return
+	# if weekday == 5 or weekday == 6:
+	# 	print("job_0600: Weekend")
+	# 	return
 
 	try:
 		print("job_0600")
