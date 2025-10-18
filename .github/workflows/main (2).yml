@@ -22,7 +22,7 @@ jobs:
     - name: Set up Chrome 139.0.7258.68
       uses: browser-actions/setup-chrome@v2
       with:
-        chrome-version: 139.0.7258.68
+        chrome-version: 141.0.7390.108
         install-chromedriver: true
     
     - name: Set up Python
