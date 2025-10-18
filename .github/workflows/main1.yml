@@ -5,7 +5,7 @@ on:
     branches: [ main ]
   schedule:
     - cron: '0 */6 * * *'  # 매 6시간마다 정각에 실행 (UTC 기준)
-
+  workflow_dispatch:
 jobs:
   test:
     runs-on: windows-latest
