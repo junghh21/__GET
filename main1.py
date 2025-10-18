@@ -125,9 +125,9 @@ def job_0600():
 def job_1800():
 	current_time = datetime.now().time()
 	weekday = datetime.now().weekday()
-	if weekday == 5 or weekday == 6:
-		print("job_1800: Weekend")
-		return
+	# if weekday == 5 or weekday == 6:
+	# 	print("job_1800: Weekend")
+	# 	return
 	try:
 		print("job_1800")
 		job_0600()
