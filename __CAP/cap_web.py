@@ -30,7 +30,7 @@ def concat_images(image1, image2, hor=None):
 		new_image.paste(image2, (0, image1.height))		
 	return new_image
 
-def capture_element_screen_by_xpath (driver, xpath, xpath_iframe=None, output_file=None):
+def capture_element_screen_by_xpath (driver, xpath, xpath_iframe=None, output_file=None, size_mod=None):
 	iframe_loc = None
 	try:    
 		if xpath_iframe:
@@ -47,6 +47,9 @@ def capture_element_screen_by_xpath (driver, xpath, xpath_iframe=None, output_fi
 		# Capture screenshot of the element's area
 		location = element.location
 		size = element.size
+		if size_mod != None:
+			size['width'] += size_mod[0]
+			size['height'] += size_mod[1]
 		print(iframe_loc, location, size)
 		png = driver.get_screenshot_as_png()
 		if xpath_iframe:
@@ -92,7 +95,8 @@ def summary_element_text_by_xpath (driver, xpath):
 def capture_element_screenshot(url, xpath, popup=None, popup_button=None, 
 															xpath_iframe=None, output_file=None, width=None,
 															click=None, click_wait=10,
-															delay_wait=None):
+															delay_wait=None, 
+															size_mod=None):
 		options = Options()
 		options.add_argument('--ignore-certificate-errors')		
 		#'''
@@ -129,7 +133,7 @@ def capture_element_screenshot(url, xpath, popup=None, popup_button=None,
 		
 		if click:
 			for path in xpath:        
-				element_image = capture_element_screen_by_xpath (driver, path)
+				element_image = capture_element_screen_by_xpath (driver, path, size_mod=size_mod)
 				output.append(element_image)
 			
 			element = WebDriverWait(driver, 10).until(
@@ -143,7 +147,7 @@ def capture_element_screenshot(url, xpath, popup=None, popup_button=None,
 	
 		
 		for path in xpath:
-			element_image = capture_element_screen_by_xpath (driver, path, xpath_iframe=xpath_iframe)
+			element_image = capture_element_screen_by_xpath (driver, path, xpath_iframe=xpath_iframe, size_mod=size_mod)
 			output.append(element_image)
 			
 		time.sleep(1)

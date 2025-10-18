@@ -126,9 +126,9 @@ from PIL import Image
 def job_30min():
 	current_time = datetime.now().time()
 	weekday = datetime.now().weekday()
-	if weekday == 5 or weekday == 6:
-		print("job_30min: Weekend")
-		return
+	# if weekday == 5 or weekday == 6:
+	# 	print("job_30min: Weekend")
+	# 	return
 
 	try:
 		print("job_30min")
@@ -136,8 +136,10 @@ def job_30min():
 		telegram_send_message('S&P Futures')
 		snp_fut = capture_element_screenshot(
 			'https://www.tradingview.com/symbols/CME_MINI-ES1!/',
-			'//*[@id="symbol-overview-page-section"]/div/div/div[1]/div[2]/div/div[1]/div')
-		snp_fut = snp_fut.resize((snp_fut.width // 2, snp_fut.height))
+			'//*[@id="symbol-overview-page-section"]/div/div/div[1]/div[2]/div/div[1]',
+			size_mod=(250, 110)
+		)
+		snp_fut = snp_fut.resize((int(snp_fut.width), int(snp_fut.width*9/16)))
 		telegram_send_photo (snp_fut)
 		#
 		telegram_send_message('VIX')
@@ -157,8 +159,10 @@ def job_30min():
 		telegram_send_message('NG Futures')
 		ng_fut = capture_element_screenshot(
 			'https://www.tradingview.com/symbols/NYMEX-NG1!/',
-			'//*[@id="symbol-overview-page-section"]/div/div/div[1]/div[2]/div/div[1]')
-		ng_fut = ng_fut.resize((ng_fut.width // 2, ng_fut.height))
+			'//*[@id="symbol-overview-page-section"]/div/div/div[1]/div[2]/div/div[1]',
+			size_mod=(250, 110)
+		)
+		ng_fut = ng_fut.resize((int(ng_fut.width), int(ng_fut.width*9/16)))
 		telegram_send_photo (ng_fut)
 	except Exception as e:
 		print(f"job_30min error: {e}")
