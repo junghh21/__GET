@@ -1,7 +1,7 @@
 import os, sys, shutil
 sys.path.append("../")
 sys.path.append("./")
-sys.stdout.reconfigure(encoding='utf-8')
+#sys.stdout.reconfigure(encoding='utf-8')
 
 import threading
 import schedule
@@ -66,11 +66,12 @@ def job_0600():
 			'/html/body/div[1]/section[4]/section[1]/section[1]/div/section/div[1]/div[2]/div[1]/div/div[1]/div[1]/div')
 		telegram_send_photo (greed)
 		#
+		telegram_send_message('VIX')
 		one_month, intra = capture_element_screenshot(
 			'https://www.cboe.com/tradable_products/vix/',
-			'//*[@id="charts-tile"]/div/div/div[2]/div[1]',
+			'/html/body/main/div/div/section[1]/div/div[3]/div[2]/div[1]/div[1]/div',
 			delay_wait=10,
-			click='//*[@id="charts-tile"]/div/div/div[2]/div[2]/div[1]/div[1]')
+			click='/html/body/main/div/div/section[1]/div/div[3]/div[2]/div[1]/div[2]/div/div/button[1]')
 		telegram_send_photo (one_month)
 		telegram_send_photo (intra)
 		#

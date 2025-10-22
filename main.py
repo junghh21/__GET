@@ -1,7 +1,7 @@
 import os, sys, shutil
 sys.path.append("../")
 sys.path.append("./")
-sys.stdout.reconfigure(encoding='utf-8')
+#sys.stdout.reconfigure(encoding='utf-8')
 
 import threading
 import schedule
@@ -141,6 +141,11 @@ def job_30min():
 		)
 		snp_fut = snp_fut.resize((int(snp_fut.width), int(snp_fut.width*9/16)))
 		telegram_send_photo (snp_fut)
+		#
+		market = capture_element_screenshot(
+			'https://finance.yahoo.com/',
+			'//*[@id="nimbus-app"]/aside/section/div[1]/div/div[2]/ul/li[1]/div/div/section/ul')
+		telegram_send_photo (market)
 		#
 		telegram_send_message('VIX')
 		one_month, intra = capture_element_screenshot(

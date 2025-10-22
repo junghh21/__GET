@@ -86,6 +86,7 @@ def summary_element_text_by_xpath (driver, xpath):
 		element = WebDriverWait(driver, 10).until(
 		EC.presence_of_element_located((By.XPATH, xpath))
 		)
+		print(element.text)
 		summary = summary_text (element.text, "3가지 포인트 한글 헤드라인")
 	except Exception as e:
 		print(f"An error occurred: {e}")
@@ -95,8 +96,7 @@ def summary_element_text_by_xpath (driver, xpath):
 def capture_element_screenshot(url, xpath, popup=None, popup_button=None, 
 															xpath_iframe=None, output_file=None, width=None,
 															click=None, click_wait=10,
-															delay_wait=None, 
-															size_mod=None):
+															delay_wait=None):
 		options = Options()
 		options.add_argument('--ignore-certificate-errors')		
 		#'''
@@ -157,15 +157,22 @@ def capture_element_screenshot(url, xpath, popup=None, popup_button=None,
 			output = output[0]
 		return output
 
-from g4f.client import Client
+# from g4f.client import Client
+import g4f
 def summary_text(content, cmd=""):
-	client = Client(provider="")
-	response = client.chat.completions.create(
-			model="gpt-4o-mini",
-			messages=[{"role": "user", "content": content + cmd}],
-			web_search=False
+	import g4f
+	response = g4f.ChatCompletion.create(
+		model=g4f.models.gpt_4,
+		messages=[{"role": "user", "content": "3 가지 포인트 단어 요약 : "+content}]
 	)
-	return response.choices[0].message.content
+	return response
+	# client = Client()
+	# response = client.chat.completions.create(
+	# 		model="gpt-4o-mini",
+	# 		messages=[{"role": "user", "content": content + cmd}],
+	# 		web_search=False
+	# )
+	# return response.choices[0].message.content
 
 def summary_element(title, url, xpath,
 										click=None, click_wait=10,
