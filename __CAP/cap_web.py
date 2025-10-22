@@ -96,9 +96,12 @@ def summary_element_text_by_xpath (driver, xpath):
 def capture_element_screenshot(url, xpath, popup=None, popup_button=None, 
 															xpath_iframe=None, output_file=None, width=None,
 															click=None, click_wait=10,
-															delay_wait=None):
+															delay_wait=None,
+															size_mod=None):
 		options = Options()
-		options.add_argument('--ignore-certificate-errors')		
+		options.add_argument("--allow-running-insecure-content")
+		options.add_argument("--disable-web-security")
+		options.add_argument("--ignore-certificate-errors")
 		#'''
 		driver = webdriver.Chrome(options=options)
 		'''
