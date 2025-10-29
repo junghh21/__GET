@@ -22,16 +22,16 @@ def job_0600():
 
 	try:
 		print("job_0600")
-		#
-		ny_mkt, ny_chart, ny_top = capture_element_screenshot(
-		'https://www.nytimes.com/section/markets-overview',
-		['//*[@id="app"]/div/div[2]', '//*[@id="app"]/div/div[3]', '//*[@id="app"]/div/div[5]'],
-		popup='//*[@id="complianceOverlay"]',
-		popup_button='//*[@id="complianceOverlay"]/div/div/button',
-		xpath_iframe = '//*[@id="site-content"]/iframe')
-		ny = concat_images(ny_mkt, ny_chart)
-		ny = concat_images(ny, ny_top)
-		telegram_send_photo(ny)
+		# #
+		# ny_mkt, ny_chart, ny_top = capture_element_screenshot(
+		# 'https://www.nytimes.com/section/markets-overview',
+		# ['//*[@id="app"]/div/div[2]', '//*[@id="app"]/div/div[3]', '//*[@id="app"]/div/div[5]'],
+		# popup='//*[@id="complianceOverlay"]',
+		# popup_button='//*[@id="complianceOverlay"]/div/div/button',
+		# xpath_iframe = '//*[@id="site-content"]/iframe')
+		# ny = concat_images(ny_mkt, ny_chart)
+		# ny = concat_images(ny, ny_top)
+		# telegram_send_photo(ny)
 
 		#
 		sentiment_meter = capture_element_screenshot(
