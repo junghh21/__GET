@@ -19,11 +19,8 @@ jobs:
     - name: UTF-8 코드 페이지 설정
       run: chcp 65001  # 한글 출력이 깨지지 않도록 UTF-8 코드 페이지로 변경
     
-    - name: Set up Chrome 
-      uses: browser-actions/setup-chrome@v2
-      with:
-        chrome-version: 'stable'
-        install-chromedriver: true
+    - name: Set up ChromeDriver
+      uses: nanasess/setup-chromedriver@v2
     
     - name: Set up Python
       uses: actions/setup-python@v4
