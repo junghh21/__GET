@@ -3,6 +3,7 @@ FROM python:3.10-slim
 # 기본 패키지 설치
 RUN apt-get update && apt-get install -y --no-install-recommends \
     ca-certificates \
+    curl \
     wget \
     gnupg \
     unzip \
