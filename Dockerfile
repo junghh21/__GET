@@ -11,6 +11,15 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     fonts-nanum* \
     && rm -rf /var/lib/apt/lists/*
 
+# Google 키를 gpg로 dearmor 하여 keyring에 저장하고 sources.list에 signed-by 옵션 추가
+RUN curl -fsSL https://dl.google.com/linux/linux_signing_key.pub \
+    | gpg --dearmor -o /usr/share/keyrings/google-linux-signing-keyring.gpg \
+  && echo "deb [arch=amd64 signed-by=/usr/share/keyrings/google-linux-signing-keyring.gpg] http://dl.google.com/linux/chrome/deb/ stable main" \
+    > /etc/apt/sources.list.d/google-chrome.list \
+  && apt-get update \
+  && apt-get install -y --no-install-recommends google-chrome-stable \
+  && rm -rf /var/lib/apt/lists/*
+
 # 로케일 설정
 RUN sed -i 's/# ko_KR.UTF-8 UTF-8/ko_KR.UTF-8 UTF-8/' /etc/locale.gen \
     && locale-gen ko_KR.UTF-8
