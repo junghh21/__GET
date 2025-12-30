@@ -26,19 +26,10 @@ RUN curl -fsSL https://dl.google.com/linux/linux_signing_key.pub \
   && rm -rf /var/lib/apt/lists/*
 
 # ChromeDriver 설치: auto이면 설치된 Chrome 메이저 버전에 맞춰 자동으로 다운로드
-RUN set -eux; \
-    if [ "${CHROMEDRIVER_VERSION}" = "auto" ]; then \
-      CHROME_VER="$(google-chrome-stable --version 2>/dev/null || google-chrome --version)"; \
-      CHROME_MAJOR="$(echo ${CHROME_VER} | sed -E 's/.* ([0-9]+)\..*/\1/')"; \
-      CD_VER="$(wget -qO- "https://chromedriver.storage.googleapis.com/LATEST_RELEASE_${CHROME_MAJOR}")"; \
-    else \
-      CD_VER="${CHROMEDRIVER_VERSION}"; \
-    fi; \
-    echo "Installing chromedriver version: ${CD_VER}"; \
-    wget -q -O /tmp/chromedriver.zip "https://chromedriver.storage.googleapis.com/${CD_VER}/chromedriver_linux64.zip"; \
-    unzip /tmp/chromedriver.zip -d /usr/local/bin/; \
-    rm /tmp/chromedriver.zip; \
-    chmod +x /usr/local/bin/chromedriver
+RUN wget -q -O /tmp/chrome.deb https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb \
+  && apt-get install -y --no-install-recommends /tmp/chrome.deb \
+  && rm -f /tmp/chrome.deb && rm -rf /var/lib/apt/lists/*
+
 
 WORKDIR /app
 
