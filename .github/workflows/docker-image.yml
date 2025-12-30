@@ -1,0 +1,38 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1) 로그인
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      
+      # 2) 빌드 및 푸시
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: ghcr.io/${{ github.repository_owner }}/venv_get:latest
+      
+      # # 3) 실행 (다른 job 또는 같은 job에서)
+      # - name: Run tests from registry
+      #   run: |
+      #     docker pull ghcr.io/${{ github.repository_owner }}/my-image:latest
+      #     docker run --rm ghcr.io/${{ github.repository_owner }}/my-image:latest python main.py
+
