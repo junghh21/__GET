@@ -38,7 +38,7 @@ COPY requirements.txt /app/requirements.txt
 RUN python -m pip install --upgrade pip setuptools wheel \
   && pip install -r /app/requirements.txt
 
-COPY . /app
+#COPY . /app
 
-CMD ["python", "main.py"]
+#CMD ["python", "main.py"]
 
