@@ -130,9 +130,9 @@ def job_30min():
 	# 	print("job_30min: Weekend")
 	# 	return
 
-	try:
+	
 		print("job_30min")
-		#
+	try:	
 		telegram_send_message('S&P Futures')
 		snp_fut = capture_element_screenshot(
 			'https://www.tradingview.com/symbols/CME_MINI-ES1!/',
@@ -141,12 +141,16 @@ def job_30min():
 		)
 		snp_fut = snp_fut.resize((int(snp_fut.width), int(snp_fut.width*9/16)))
 		telegram_send_photo (snp_fut)
-		#
+	except:
+		telegram_send_message('S&P Futures capture failed') 
+	try:
 		market = capture_element_screenshot(
 			'https://finance.yahoo.com/',
-			'//*[@id="nimbus-app"]/aside/section/div[1]/div/div[2]/ul/li[1]/div/div/section/ul')
+			'/html/body/div[2]/div[3]/main/aside/section/div[1]/div/div[2]/ul/li[1]/div/div/section/ul')
 		telegram_send_photo (market)
-		#
+	except:
+		telegram_send_message('finance.yahoo. capture failed') 
+	try:
 		telegram_send_message('VIX')
 		one_month, intra = capture_element_screenshot(
 			'https://www.cboe.com/tradable_products/vix/',
@@ -155,12 +159,16 @@ def job_30min():
 			click='/html/body/main/div/div/section[1]/div/div[3]/div[2]/div[1]/div[2]/div/div/button[1]')
 		telegram_send_photo (one_month)
 		telegram_send_photo (intra)
-		#
+	except:
+		telegram_send_message('VIX capture failed') 
+	try:
 		term = capture_element_screenshot(
 			'http://vixcentral.com/',
 			'//*[@id="container1"]')
 		telegram_send_photo (term)
-		#
+	except:
+		telegram_send_message('vixcentral capture failed') 
+	try:
 		telegram_send_message('NG Futures')
 		ng_fut = capture_element_screenshot(
 			'https://www.tradingview.com/symbols/NYMEX-NG1!/',
@@ -169,8 +177,8 @@ def job_30min():
 		)
 		ng_fut = ng_fut.resize((int(ng_fut.width), int(ng_fut.width*9/16)))
 		telegram_send_photo (ng_fut)
-	except Exception as e:
-		print(f"job_30min error: {e}")
+	except:
+		telegram_send_message('NG Futures capture failed') 
 
 import requests
 import json
