@@ -102,6 +102,10 @@ def capture_element_screenshot(url, xpath, popup=None, popup_button=None,
 		options.add_argument("--allow-running-insecure-content")
 		options.add_argument("--disable-web-security")
 		options.add_argument("--ignore-certificate-errors")
+		options.add_argument("--headless")        # GUI 없는 환경에서 필수
+		options.add_argument("--no-sandbox")      # 컨테이너 환경에서 권장
+		options.add_argument("--disable-dev-shm-usage")  # /dev/shm 문제 방지
+		options.add_argument("--disable-gpu")     # GPU 없는 환경에서 권장
 		#'''
 		driver = webdriver.Chrome(options=options)
 		'''
