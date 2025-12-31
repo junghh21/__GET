@@ -30,8 +30,10 @@ jobs:
     - name: Run tests inside container
       run: |
         docker run --rm \
-          -e LANG=ko_KR.UTF-8 -e LC_ALL=ko_KR.UTF-8 -e PYTHONIOENCODING=utf-8 \
-          -v "$(pwd)":/app \ 
+          -e LANG=ko_KR.UTF-8 \
+          -e LC_ALL=ko_KR.UTF-8 \
+          -e PYTHONIOENCODING=utf-8 \
+          -v "$(pwd)":/app \
           -w /app \
           venv_get:latest \
           python main.py
