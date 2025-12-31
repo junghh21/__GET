@@ -32,7 +32,7 @@ def job_0600():
 		# ny = concat_images(ny, ny_top)
 		# telegram_send_photo(ny)
 
-	try
+	try:
 		sentiment_meter = capture_element_screenshot(
 			'https://www.hulltacticalfunds.com/market-sentiment-meter/',
 			'//*[@id="__layout"]/div/div[2]/div[6]/div/div/div',
