@@ -36,4 +36,4 @@ jobs:
           -v "$(pwd)":/app \
           -w /app \
           ghcr.io/${{ github.repository_owner }}/venv_get:latest \
-          python main.py
+          python main1.py
