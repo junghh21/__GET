@@ -35,5 +35,5 @@ jobs:
           -e PYTHONIOENCODING=utf-8 \
           -v "$(pwd)":/app \
           -w /app \
-          venv_get:latest \
+          ghcr.io/${{ github.repository_owner }}/venv_get:latest \
           python main.py
