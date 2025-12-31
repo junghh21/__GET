@@ -131,7 +131,7 @@ def job_30min():
 	# 	return
 
 	
-		print("job_30min")
+	print("job_30min")
 	try:	
 		telegram_send_message('S&P Futures')
 		snp_fut = capture_element_screenshot(
