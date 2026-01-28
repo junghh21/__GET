@@ -1,0 +1,34 @@
+name: Windows LONG Test
+
+on:
+  workflow_dispatch:
+  #push:  # 모든 브랜치에 푸시될 때 실행
+
+jobs:
+  test:
+    runs-on: windows-latest
+    env:
+      LANG: ko_KR.UTF-8       # 한국어 로케일 설정 (일부 환경에서만 적용됨)
+      LC_ALL: ko_KR.UTF-8
+      
+    steps:      
+    - name: Download Chrome Remote Desktop Host
+      run: |
+        Invoke-WebRequest -Uri "https://dl.google.com/edgedl/chrome-remote-desktop/chromeremotedesktophost.msi" -OutFile "chromeremotedesktophost.msi"
+        Start-Process msiexec.exe -ArgumentList '/i chromeremotedesktophost.msi /quiet /norestart' -Wait
+    - name: Setup Chrome Remote Desktop
+      run: >
+        & "${Env:PROGRAMFILES(X86)}\Google\Chrome Remote Desktop\CurrentVersion\remoting_start_host.exe" 
+        --code="4/0AVMBsJiZwyMmq0z6Ur-d7qI4_JTG_lSRJgB5xS0CTCgG49GNm7qm6LwFqoV7pZ7w8Qss-w" 
+        --redirect-url="https://remotedesktop.google.com/_/oauthredirect" 
+        --name=$Env:COMPUTERNAME --pin=111111
+    - name: 30초 대기
+      run: |
+        Start-Sleep -Seconds 3600
+        Start-Sleep -Seconds 3600
+        Start-Sleep -Seconds 3600
+        Start-Sleep -Seconds 3600
+        Start-Sleep -Seconds 3600
+        Start-Sleep -Seconds 3600
+      shell: pwsh
+    

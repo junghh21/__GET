@@ -1,0 +1,35 @@
+name: test error
+
+on:
+  workflow_dispatch: # Cho phép chạy workflow thủ công từ giao diện GitHub
+
+jobs:
+  setup-chrome-rd:
+    runs-on: windows-latest # Chạy trên máy ảo Windows mới nhất
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: 1
+        run: |
+          Invoke-WebRequest -Uri "https://dl.google.com/chrome/install/standalonesetup64.exe" -OutFile "chrome_setup.exe"
+          Start-Process "chrome_setup.exe" -ArgumentList "/silent /install" -Wait
+
+      - name: 2
+        run: |
+          Invoke-WebRequest -Uri "https://dl.google.com/edgedl/chrome-remote-desktop/chromeremotedesktophost.msi" -OutFile "chrome_remote_desktop_host.msi"
+          Start-Process "msiexec.exe" -ArgumentList "/i", "chrome_remote_desktop_host.msi", "/quiet" -Wait
+      
+      - name: 3
+        run: |
+           & "${Env:PROGRAMFILES(X86)}\Google\Chrome Remote Desktop\CurrentVersion\remoting_start_host.exe" --code="4/0Ab_5qlmHXJPmPN2rqpCszGuuDP_zXdNnaCH6QpPWfQeQ2qJiQHmZcIIJkylr-nn1uEh58Q" --redirect-url="https://remotedesktop.google.com/_/oauthredirect" --name=$Env:COMPUTERNAME --pin=333000
+           
+      - name: Wait
+        run: |
+          Start-Sleep -Seconds 2147483
+      - name: Wait2
+        run: |
+          Start-Sleep -Seconds 2147483
+
+          

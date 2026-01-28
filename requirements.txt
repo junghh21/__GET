@@ -1,5 +1,6 @@
 selenium
 requests
+selectolax
 Pillow
 schedule
 g4f
