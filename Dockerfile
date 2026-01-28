@@ -7,7 +7,7 @@ ARG CHROMEDRIVER_VERSION=auto
 # 필수 패키지 설치 (gnupg, curl, wget 등 포함)
 RUN apt-get update \
   && apt-get install -y --no-install-recommends \
-     ca-certificates curl gnupg wget unzip locales libnss3 libasound2 fonts-liberation fonts-nanum* \
+     git ca-certificates curl gnupg wget unzip locales libnss3 libasound2 fonts-liberation fonts-nanum* \
   && sed -i 's/# ko_KR.UTF-8 UTF-8/ko_KR.UTF-8 UTF-8/' /etc/locale.gen \
   && locale-gen ko_KR.UTF-8 \
   && rm -rf /var/lib/apt/lists/*
