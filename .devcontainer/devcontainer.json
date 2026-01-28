@@ -1,19 +1,13 @@
-// For format details, see https://aka.ms/devcontainer.json. For config options, see the
-// README at: https://github.com/devcontainers/templates/tree/main/src/python
 {
   "name": "venv_get",
-  "dockerFile": "Dockerfile",
-  "context": "..",
-  "runArgs": ["--init"],
-  "settings": {
+  "image": "ghcr.io/junghh21/venv_get:latest",
+	"settings": {
     "terminal.integrated.shell.linux": "/bin/bash"
   },
-  // "extensions": [
-  //   "ms-python.python",
-  //   "ms-toolsai.jupyter",
-  //   "ms-vscode.cpptools"
-  // ],
-  "forwardPorts": [8000, 3000],
-  // "postCreateCommand": "pip install -r requirements.txt",
-  "remoteUser": "vscode"
+  "extensions": [
+    "ms-python.python",
+  ],
+  "forwardPorts": [8000],
+  "postCreateCommand": "echo 'Dev Container ready!'"
 }
+
