@@ -1,4 +1,4 @@
-import os, sys
+import os, sys, time
 sys.path.append("../")
 sys.path.append("./")
 
@@ -55,6 +55,41 @@ def _make_context(browser, viewport_width=None):
 	return browser.new_context(**kwargs)
 
 
+def _hide_overlays(page, target_handle=None):
+	"""Heuristically hide popup-like overlays right before a screenshot.
+
+	An element is treated as an overlay (and hidden via display:none) if it
+	is fixed/sticky positioned (or a <dialog>), covers >= 15% of the
+	viewport, and has z-index >= 100. Elements that are DOM ancestors of
+	the target are skipped so the capture target is never accidentally
+	hidden.
+
+	Pass an ElementHandle (from `locator.element_handle()`) as
+	`target_handle` to enable the ancestor-skip safeguard.
+	"""
+	page.evaluate(
+		"""(target) => {
+			const docW = window.innerWidth, docH = window.innerHeight;
+			const vpArea = docW * docH;
+			let hidden = 0;
+			for (const el of document.querySelectorAll('*')) {
+				const cs = getComputedStyle(el);
+				const overlayLike = cs.position === 'fixed' || cs.position === 'sticky' || el.tagName === 'DIALOG';
+				if (!overlayLike) continue;
+				const r = el.getBoundingClientRect();
+				if (r.width * r.height < vpArea * 0.15) continue;
+				const z = parseInt(cs.zIndex);
+				if (!(z >= 100 || el.tagName === 'DIALOG')) continue;
+				if (target && el.contains(target)) continue;  // DOM ancestor of target — keep
+				el.style.setProperty('display', 'none', 'important');
+				hidden++;
+			}
+			return hidden;
+		}""",
+		target_handle,
+	)
+
+
 def _shoot_xpath(page, xpath, frame_xpath=None, size_mod=None, output_file=None):
 	try:
 		if frame_xpath:
@@ -63,6 +98,16 @@ def _shoot_xpath(page, xpath, frame_xpath=None, size_mod=None, output_file=None)
 			target = page.locator(_selector(xpath)).first
 		target.scroll_into_view_if_needed(timeout=10000)
 		page.wait_for_timeout(2000)
+		# Hide popup/banner overlays that may cover the target before screenshot.
+		# frame_xpath case: target lives inside an iframe; the ancestor-skip safeguard
+		# can't traverse iframe boundaries, so we pass None and accept that outer-page
+		# overlays are hidden by area/zIndex heuristic alone (iframe itself is rarely
+		# fixed/sticky + viewport-spanning so usually fine).
+		try:
+			tgt = None if frame_xpath else target.element_handle()
+			_hide_overlays(page, tgt)
+		except Exception as e:
+			print(f"  hide_overlays skipped: {e}")
 		if size_mod:
 			box = target.bounding_box()
 			if box is None:
@@ -146,13 +191,75 @@ def capture_element_screenshot(url, xpath, popup=None, popup_button=None,
 	return output
 
 
-import g4f
-def summary_text(content, cmd=""):
-	response = g4f.ChatCompletion.create(
-		model=g4f.models.gpt_4,
-		messages=[{"role": "user", "content": "3 가지 포인트 단어 요약 : " + content}]
+# Gemini 2.5 flash-lite free tier nominally 15 RPM, but per-process throttle
+# can't see calls from other processes (e.g. fixer.py also throttles itself).
+# 8s sustained = 7.5 RPM, half the cap, gives headroom for transient bursts.
+_SUMMARY_GAP_S = 8.0
+_summary_last_call_ts = 0.0
+
+
+def _summary_throttle():
+	global _summary_last_call_ts
+	gap = time.monotonic() - _summary_last_call_ts
+	if gap < _SUMMARY_GAP_S:
+		time.sleep(_SUMMARY_GAP_S - gap)
+	_summary_last_call_ts = time.monotonic()
+
+
+def _gemini_summary(content, cmd):
+	import requests
+	api_key = os.environ.get("GEMINI_API_KEY")
+	if not api_key:
+		return ""
+	# Use gemini-2.5-flash (full) for summaries to keep its free-tier daily
+	# request bucket separate from fixer.py (which uses gemini-2.5-flash-lite).
+	# This avoids one feature exhausting the other's quota — each gets its own
+	# 20-RPD allowance.
+	endpoint = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent"
+	prompt = (
+		(cmd or "한국어 3줄 요약")
+		+ ". 각 줄 50자 이내, 번호/불릿 없이 줄바꿈으로만 구분. 원문에 없는 사실 추가 금지.\n\n원문:\n"
+		+ content
 	)
-	return response
+	body = {"contents": [{"parts": [{"text": prompt}]}]}
+	r = None
+	for attempt, backoff in enumerate([15, 30, 60], start=1):
+		_summary_throttle()
+		try:
+			r = requests.post(endpoint, params={"key": api_key}, json=body, timeout=60)
+		except Exception as e:
+			print(f"  gemini summary transport error (attempt {attempt}): {e}")
+			return ""
+		if r.status_code not in (429, 503):
+			break
+		print(f"  gemini summary http {r.status_code} (attempt {attempt}/3): backing off {backoff}s")
+		time.sleep(backoff)
+	if r is None or not r.ok:
+		print(f"  gemini summary http {r.status_code if r else 'none'}: {(r.text[:200] if r else '')}")
+		return ""
+	try:
+		return r.json()["candidates"][0]["content"]["parts"][0]["text"].strip()
+	except (KeyError, IndexError, ValueError) as e:
+		print(f"  gemini summary parse error: {e}")
+		return ""
+
+
+def summary_text(content, cmd=""):
+	"""Summarize the supplied prose. Gemini if GEMINI_API_KEY is set, g4f
+	otherwise (legacy fallback). Returns "" on failure rather than raising,
+	so callers can post a header-only message."""
+	out = _gemini_summary(content, cmd)
+	if out:
+		return out
+	try:
+		import g4f
+		return g4f.ChatCompletion.create(
+			model=g4f.models.gpt_4,
+			messages=[{"role": "user", "content": (cmd or "3 가지 포인트 단어 요약") + " : " + content}],
+		)
+	except Exception as e:
+		print(f"  g4f fallback error: {e}")
+		return ""
 
 
 def summary_element(title, url, xpath,
