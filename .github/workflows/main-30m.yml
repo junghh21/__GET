@@ -1,39 +1,42 @@
-name: GET 30m ChromeDriver Test
+name: GET 30m capture
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
+    paths:
+      - 'main.py'
+      - '__CAP/**'
+      - '__COMMON/**'
+      - 'requirements.txt'
+      - 'Dockerfile'
   schedule:
     - cron: '*/30 * * * *'
   workflow_dispatch:
 
+permissions:
+  contents: read
+  packages: read
+
+concurrency:
+  group: get-30m
+  cancel-in-progress: false
+
 jobs:
-  build-and-test:
+  capture:
     runs-on: ubuntu-latest
-
+    timeout-minutes: 20
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
-    # 1) 로그인
-    - name: Log in to GitHub Container Registry
-      uses: docker/login-action@v2
-      with:
-        registry: ghcr.io
-        username: ${{ github.actor }}
-        password: ${{ secrets.PAT3 }}
-        
-    # 3) 실행 (다른 job 또는 같은 job에서)
-    - name: Run tests from registry
-      run: |
-        docker pull ghcr.io/${{ github.repository_owner }}/venv_get:latest
+      - uses: actions/checkout@v4
 
-    - name: Run tests inside container
-      run: |
-        docker run --rm \
-          -e LANG=ko_KR.UTF-8 \
-          -e LC_ALL=ko_KR.UTF-8 \
-          -e PYTHONIOENCODING=utf-8 \
-          -v "$(pwd)":/app \
-          -w /app \
-          ghcr.io/${{ github.repository_owner }}/venv_get:latest \
-          python main.py
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.PAT3 }}
+
+      - name: Run capture
+        run: |
+          docker run --rm \
+            -v "$(pwd)":/app -w /app \
+            ghcr.io/${{ github.repository_owner }}/venv_get:latest \
+            python main.py
