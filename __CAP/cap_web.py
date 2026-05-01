@@ -211,11 +211,7 @@ def _gemini_summary(content, cmd):
 	api_key = os.environ.get("GEMINI_API_KEY")
 	if not api_key:
 		return ""
-	# Use gemini-2.5-flash (full) for summaries to keep its free-tier daily
-	# request bucket separate from fixer.py (which uses gemini-2.5-flash-lite).
-	# This avoids one feature exhausting the other's quota — each gets its own
-	# 20-RPD allowance.
-	endpoint = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent"
+	endpoint = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite-preview:generateContent"
 	prompt = (
 		(cmd or "한국어 3줄 요약")
 		+ ". 각 줄 50자 이내, 번호/불릿 없이 줄바꿈으로만 구분. 원문에 없는 사실 추가 금지.\n\n원문:\n"

@@ -131,7 +131,7 @@ def _gemini_throttle():
 
 def _gemini(prompt: str, api_key: str) -> Optional[str]:
 	import requests
-	endpoint = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent"
+	endpoint = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite-preview:generateContent"
 	body = {"contents": [{"parts": [{"text": prompt}]}]}
 	# 429 (quota burst) / 503 (overload) → back off and retry up to 3 times
 	# with progressive 15→30→60s pauses. Other failures fall through.
