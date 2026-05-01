@@ -9,6 +9,7 @@ import time
 from datetime import datetime
 
 from __CAP.cap_web import capture_element_screenshot, summary_element, capture_with_summary, concat_images
+from __CAP.targets import BY_NAME as T
 from __COMMON.telegram_req import telegram_send_photo, telegram_send_message
 from PIL import Image
 
@@ -132,53 +133,42 @@ def job_30min():
 
 	
 	print("job_30min")
-	try:	
-		telegram_send_message('S&P Futures')
-		snp_fut = capture_element_screenshot(
-			'https://www.tradingview.com/symbols/CME_MINI-ES1!/',
-			'//*[@id="symbol-overview-page-section"]/div/div/div[1]/div[2]/div/div[1]',
-			#size_mod=(250, 110)
-		)
-		snp_fut = snp_fut.resize((int(snp_fut.width), int(snp_fut.width*9/16)))
-		telegram_send_photo (snp_fut)
-	except:
-		telegram_send_message('S&P Futures capture failed') 
 	try:
-		market = capture_element_screenshot(
-			'https://finance.yahoo.com/',
-			'/html/body/div[2]/div[3]/main/aside/section/div[1]/div/div[2]/ul/li[1]/div/div/section/ul')
-		telegram_send_photo (market)
+		telegram_send_message('S&P Futures')
+		t = T["tradingview-es-futures"]
+		snp_fut = capture_element_screenshot(t.url, t.xpath)
+		snp_fut = snp_fut.resize((int(snp_fut.width), int(snp_fut.width*9/16)))
+		telegram_send_photo(snp_fut)
 	except:
-		telegram_send_message('finance.yahoo. capture failed') 
+		telegram_send_message('S&P Futures capture failed')
+	try:
+		t = T["yahoo-finance-markets"]
+		market = capture_element_screenshot(t.url, t.xpath)
+		telegram_send_photo(market)
+	except:
+		telegram_send_message('finance.yahoo. capture failed')
 	try:
 		telegram_send_message('VIX')
-		one_month, intra = capture_element_screenshot(
-			'https://www.cboe.com/tradable_products/vix/',
-			'/html/body/main/div/div/section[1]/div/div[3]/div[2]/div[1]/div[1]/div',
-			delay_wait=10,
-			click='/html/body/main/div/div/section[1]/div/div[3]/div[2]/div[1]/div[2]/div/div/button[1]')
-		telegram_send_photo (one_month)
-		telegram_send_photo (intra)
+		t = T["cboe-vix"]
+		one_month, intra = capture_element_screenshot(t.url, t.xpath, delay_wait=t.delay_wait, click=t.click)
+		telegram_send_photo(one_month)
+		telegram_send_photo(intra)
 	except:
-		telegram_send_message('VIX capture failed') 
+		telegram_send_message('VIX capture failed')
 	try:
-		term = capture_element_screenshot(
-			'http://vixcentral.com/',
-			'//*[@id="container1"]')
-		telegram_send_photo (term)
+		t = T["vixcentral-term"]
+		term = capture_element_screenshot(t.url, t.xpath)
+		telegram_send_photo(term)
 	except:
-		telegram_send_message('vixcentral capture failed') 
+		telegram_send_message('vixcentral capture failed')
 	try:
 		telegram_send_message('NG Futures')
-		ng_fut = capture_element_screenshot(
-			'https://www.tradingview.com/symbols/NYMEX-NG1!/',
-			'//*[@id="symbol-overview-page-section"]/div/div/div[1]/div[2]/div/div[1]',
-			#size_mod=(250, 110)
-		)
+		t = T["tradingview-ng-futures"]
+		ng_fut = capture_element_screenshot(t.url, t.xpath)
 		ng_fut = ng_fut.resize((int(ng_fut.width), int(ng_fut.width*9/16)))
-		telegram_send_photo (ng_fut)
+		telegram_send_photo(ng_fut)
 	except:
-		telegram_send_message('NG Futures capture failed') 
+		telegram_send_message('NG Futures capture failed')
 
 import requests
 import json
@@ -215,21 +205,16 @@ def job_coin():
 	# e_paid = tree.css_first("div > div > table > tbody > tr:nth-child(6) > td:nth-child(4) > a")
 	# paid = float(e_paid.text()[:-5])
 	# telegram_send_message (f"{W}:  {hr} H/s ({paid:.0f})", "8490037832:AAHmmxVAkA5DqQjJno2O5Oqy2JEHgsDb9Dg", -1003016231971)
-try:
-	html = requests.get(f"https://www.coingecko.com/").text
-	tree = HTMLParser(html)
-	e_name1 = tree.css_first("body > div.container > main > div > div.gecko-sticky-table-wrapper > table > tbody > tr:nth-child(1) > td:nth-child(3) > a > div > div > div")
-	name1 = e_name1.text().strip()
-	e_price1 = tree.css_first("body > div.container > main > div > div.gecko-sticky-table-wrapper > table > tbody > tr:nth-child(1) > td:nth-child(5) > span")
-	price1 = e_price1.text()[:-3	]
-	e_name2 = tree.css_first("body > div.container > main > div > div.gecko-sticky-table-wrapper > table > tbody > tr:nth-child(2) > td:nth-child(3) > a > div > div > div")
-	name2 = e_name2.text().strip()
-	e_price2 = tree.css_first("body > div.container > main > div > div.gecko-sticky-table-wrapper > table > tbody > tr:nth-child(2) > td:nth-child(5) > span")
-	price2 = e_price2.text()[:-3]
-	telegram_send_message (f"{name1}: {price1}", "8490037832:AAHmmxVAkA5DqQjJno2O5Oqy2JEHgsDb9Dg", -1003016231971)
-	telegram_send_message (f"{name2}: {price2}", "8490037832:AAHmmxVAkA5DqQjJno2O5Oqy2JEHgsDb9Dg", -1003016231971)
-except:
-	pass
+_UA = {"User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"}
+for slug in ("bitcoin", "ethereum"):
+	try:
+		html = requests.get(f"https://www.coingecko.com/en/coins/{slug}", headers=_UA, timeout=20).text
+		block = HTMLParser(html).css_first('[data-coin-show-target="staticCoinPrice"]')
+		name = block.css_first("h1 > div").text(strip=True)
+		price = block.css_first('span[data-price-target]').text(strip=True)
+		telegram_send_message(f"{name}: {price}", "8490037832:AAHmmxVAkA5DqQjJno2O5Oqy2JEHgsDb9Dg", -1003016231971)
+	except Exception as e:
+		print(f"coingecko {slug} error: {e}")
 try:
 	html = requests.get(f"https://coinmarketcap.com/ko/currencies/microbitcoin/").text
 	tree = HTMLParser(html)

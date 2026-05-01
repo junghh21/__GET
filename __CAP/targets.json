@@ -1,0 +1,288 @@
+{
+  "targets": [
+    {
+      "name": "tradingview-es-futures",
+      "url": "https://www.tradingview.com/symbols/CME_MINI-ES1!/",
+      "xpath": ["[data-lightweight-mini-chart-id=\"1\"]"],
+      "delay_wait": 0,
+      "goal": "S&P 500 E-mini front-month futures (ES) primary mini-chart on the symbol overview page — TradingView's tv-lightweight-charts canvas card.",
+      "landmarks": [
+        "Top of the symbol overview page, the primary chart card (NOT the related-symbols mini-charts further down)",
+        "Rendered with TradingView's lightweight-charts JS lib — outer container has class 'tv-lightweight-charts' and a <table> with two <canvas> overlays",
+        "There are multiple mini-charts on the page; the page's primary one is indexed 1"
+      ],
+      "stable_attrs": [
+        "data-lightweight-mini-chart-id=\"1\" — primary chart (id=\"2\", \"3\"... are related/secondary charts)",
+        "class 'tv-lightweight-charts' marks the chart wrapper but matches all charts on the page; combine with data-lightweight-mini-chart-id for uniqueness",
+        "Class 'chart-XXXXXX' has a hash suffix that changes between deploys — DO NOT rely on it"
+      ]
+    },
+    {
+      "name": "yahoo-finance-markets",
+      "url": "https://finance.yahoo.com/markets/",
+      "xpath": ["//section[@data-testid=\"world-indices\"][./header/h3[normalize-space()=\"Americas\"]]"],
+      "delay_wait": 0,
+      "goal": "Yahoo Finance /markets/ page — the 'Americas' regional indices table card (S&P 500, Dow, Nasdaq, Russell 2000, etc.).",
+      "landmarks": [
+        "URL is /markets/ (NOT the homepage / which now redirects/restructures)",
+        "Page lists four regional sections: 'World Indices' (summary), 'Americas', 'Europe', 'Asia' — each is a <section data-testid='world-indices'> sibling",
+        "We want the one whose direct-child header h3 is 'Americas'"
+      ],
+      "stable_attrs": [
+        "data-testid=\"world-indices\" — applies to all four sections, so SCOPE BY HEADER TEXT",
+        "Direct-child path 'section > header > h3' containing the region name is reliable",
+        "Class names like 'yf-1tpeyy7', 'yf-8abkgo' have build-hash suffixes — DO NOT use",
+        "data-testid-header=\"ticker\" / 'sparkline' / 'price' on the table headers are also stable"
+      ]
+    },
+    {
+      "name": "yahoo-finance-markets-id",
+      "url": "https://finance.yahoo.com/markets/",
+      "xpath": ["section[data-testid=\"heatmap\"]"],
+      "delay_wait": 4,
+      "goal": "Yahoo Finance /markets/ page — the S&P 500 sector heatmap (Treemap). Each tile is a sector colored by day return; tooltip shows day/YTD return + market weight.",
+      "landmarks": [
+        "Below the indices tables on the /markets/ page",
+        "Visual treemap with rectangular tiles per sector (Technology, Financials, etc.)",
+        "Each tile is an <a class='rect-container'> with id=sector-slug and data-index"
+      ],
+      "stable_attrs": [
+        "section[data-testid=\"heatmap\"] — exact, stable",
+        "Inner div has role='region' aria-label='Heatmap'",
+        "Tile <a> elements have stable id (sector slug, e.g., 'technology', 'financials') and href='/sectors/<slug>/'",
+        "Class names like 'yf-1whrcng', 'yf-1aqyc8a' are build-hash suffixed — DO NOT use"
+      ]
+    },
+    {
+      "name": "cboe-vix",
+      "url": "https://www.cboe.com/tradable_products/vix/",
+      "xpath": ["[data-chart^=\"chart-\"][data-variant=\"light\"]"],
+      "click": "//button[@role=\"radio\" and normalize-space()=\"Intraday\"]",
+      "delay_wait": 10,
+      "goal": "VIX product page chart panel — capture the default 1M chart first, then click the 'Intraday' radio button and capture again. Page is built with Radix UI + Recharts + Tailwind.",
+      "landmarks": [
+        "Chart container is a <div> with attribute data-chart starting with 'chart-' and data-variant='light' (the value after 'chart-' is dynamic per render)",
+        "Timeframe row is a Radix UI RadioGroup: <button role='radio'> with text 'Intraday', '1M', '3M', '1Y'. Active button has data-state='on' / aria-checked='true'.",
+        "Chart and buttons are siblings inside the same panel under main content section"
+      ],
+      "stable_attrs": [
+        "data-chart^='chart-' (prefix is stable; suffix is a Radix-generated id like «...»)",
+        "data-variant='light' (theme variant)",
+        "button[role='radio'] with normalize-space()='Intraday' (or '1M'/'3M'/'1Y') — text + role is the most stable handle",
+        "Avoid Radix-generated radix-«...» ids — they regenerate on each render"
+      ]
+    },
+    {
+      "name": "vixcentral-term",
+      "url": "http://vixcentral.com/",
+      "xpath": ["#container1"],
+      "delay_wait": 8,
+      "goal": "VIX futures term-structure chart on vixcentral.com — Highcharts SVG drawn into a hardcoded #container1 div sized 800x400.",
+      "landmarks": [
+        "First chart on the page, top-left",
+        "Hardcoded outer wrapper: <div id='container1' class='ui-widget' style='width: 800px; height: 400px'>",
+        "Highcharts JS injects an <svg> with a <rect class='highcharts-background'> filling 800x400; chart needs ~5-8s after page load to draw"
+      ],
+      "stable_attrs": [
+        "id='container1' is hardcoded by the site author and stable",
+        "Inside the SVG, 'rect.highcharts-background' is the chart frame; 'g.highcharts-axis' marks axes",
+        "delay_wait must be >=5s so Highcharts has time to render before screenshot — capturing too early yields a blank 800x400 box",
+        "Site uses bot-detection that blocks rendering with default headless UA — capture must use a realistic UA and --disable-blink-features=AutomationControlled (already wired into cap_web._LAUNCH_ARGS)"
+      ]
+    },
+    {
+      "name": "tradingview-ng-futures",
+      "url": "https://www.tradingview.com/symbols/NYMEX-NG1!/",
+      "xpath": ["[data-lightweight-mini-chart-id=\"1\"]"],
+      "delay_wait": 0,
+      "goal": "Natural Gas (NG) front-month futures primary mini-chart — same TradingView page template as ES futures.",
+      "landmarks": ["Same as tradingview-es-futures"],
+      "stable_attrs": ["Same as tradingview-es-futures: data-lightweight-mini-chart-id=\"1\" is the primary chart"]
+    },
+    {
+      "name": "hull-sentiment-meter",
+      "url": "https://www.hulltacticalfunds.com/market-sentiment-meter/",
+      "xpath": [".progress-bar"],
+      "delay_wait": 5,
+      "goal": "Hull Tactical 'Market Sentiment Meter' panel — heading 'Market Sentiment Meter' with the current numeric reading (e.g., 'Current: 92'), a horizontal scale, and the gauge SVG image below it.",
+      "landmarks": [
+        "Single panel labeled 'Market Sentiment Meter' with a 'Current: NN' span (id='meter_data')",
+        "Below the heading: a thin horizontal SVG bar (id='progress-bar') showing the position on the 0-100 scale, then a meter image '/_nuxt/img/<hash>.svg'",
+        "Page built with Nuxt; Vue scoped attribute is data-v-2d594030 on every element"
+      ],
+      "stable_attrs": [
+        "Outer wrapper class='progress-bar' is unique on the page (count=1)",
+        "Inner anchors: id='meter_data' (current value text), id='progress-bar' (inner SVG bar)",
+        "Avoid the deep //*[@id='__layout']/.../div[N]/... positional path — re-orderings of siblings break it"
+      ]
+    },
+    {
+      "name": "finviz-sec-map",
+      "url": "https://finviz.com/map.ashx?t=sec",
+      "xpath": ["#canvas-wrapper canvas.chart"],
+      "delay_wait": 0,
+      "goal": "Finviz S&P 500 sector treemap — main canvas drawn inside the wrapper, excluding the transparent hover-overlay canvas.",
+      "landmarks": [
+        "Two stacked <canvas> elements inside #canvas-wrapper: the main 'chart' canvas with the rendered map, and the 'hover-canvas' overlay used for tooltips",
+        "Main canvas has fallback text 'S&P 500 Map' and the class 'chart' (and 'initialized' once JS finishes drawing)"
+      ],
+      "stable_attrs": [
+        "id='canvas-wrapper' is stable",
+        "canvas.chart is the main map; canvas.hover-canvas is the overlay (avoid)",
+        "Class 'initialized' appears AFTER drawing — useful as a readiness gate but not strictly required for selection"
+      ]
+    },
+    {
+      "name": "te-us-stock-market",
+      "url": "https://tradingeconomics.com/united-states/stock-market",
+      "xpath": ["#description", "#UpdatePanelChart .highcharts-container"],
+      "delay_wait": 10,
+      "goal": "TradingEconomics page for US stock market: (1) the textual description block summarizing recent index moves, and (2) the Highcharts chart inside the UpdatePanel (without surrounding panel chrome).",
+      "landmarks": [
+        "Description: a prose block with id='description' under the page title",
+        "Chart: ASP.NET UpdatePanel id='UpdatePanelChart' wraps a Highcharts SVG with class 'highcharts-container'"
+      ],
+      "stable_attrs": [
+        "id='description' is stable (text block)",
+        "id='UpdatePanelChart' is stable (panel wrapper)",
+        "'#UpdatePanelChart .highcharts-container' isolates the chart SVG from the panel chrome (avoid plain '#UpdatePanelChart' which adds padding, and '#UpdatePanelChart svg' which also matches toolbar icon SVGs)",
+        "Site uses Highcharts; chart needs ~5-8s after load to draw. Bot-detection is non-trivial — capture must use a realistic UA (already wired into cap_web._LAUNCH_ARGS / element_checker)"
+      ]
+    },
+    {
+      "name": "cnn-fear-greed",
+      "url": "https://edition.cnn.com/markets/fear-and-greed",
+      "xpath": [".market-fng-gauge:not(.market-fng-gauge_mini) .market-fng-gauge__meter-container"],
+      "delay_wait": 4,
+      "goal": "CNN Fear & Greed Index — the LARGE gauge dial in the main article body (NOT the small mini-gauge in the page-top ribbon).",
+      "landmarks": [
+        "Page renders the gauge twice: a small mini variant in the top market ribbon, and the full-size gauge in the article body inside a tabbed container",
+        "We want the large one — has parent class 'market-fng-gauge' (without the '_mini' modifier)",
+        "SVG inside has id='fear-and-greed-dial' and viewBox='0 0 338 173'"
+      ],
+      "stable_attrs": [
+        "BEM classes 'market-fng-gauge', 'market-fng-gauge_mini' (mini variant), 'market-fng-gauge__meter-container', 'market-fng-gauge__meter', 'market-fng-gauge__dial' — all stable",
+        "data-index-label='greed'/'fear'/'neutral'/'extreme-fear'/'extreme-greed' on .market-fng-gauge__meter (state attribute)",
+        "id='fear-and-greed-dial' on the SVG (unique once the main gauge is rendered, but stale if mini renders first — prefer scoping via :not(_mini))"
+      ]
+    },
+    {
+      "name": "te-natural-gas",
+      "url": "https://tradingeconomics.com/commodity/natural-gas",
+      "xpath": ["#description", "#UpdatePanelChart .highcharts-container"],
+      "delay_wait": 10,
+      "goal": "TradingEconomics page for Henry Hub Natural Gas commodity: (1) prose description block summarizing recent price moves, (2) the Highcharts chart inside the UpdatePanel (without surrounding panel chrome).",
+      "landmarks": [
+        "Description: a prose block with id='description' under the page title",
+        "Chart: ASP.NET UpdatePanel id='UpdatePanelChart' wraps a Highcharts SVG with class 'highcharts-container'"
+      ],
+      "stable_attrs": [
+        "id='description' is stable (a paragraph block, NOT the <meta name='description'> head tag)",
+        "id='UpdatePanelChart' is stable (panel wrapper)",
+        "'#UpdatePanelChart .highcharts-container' isolates the chart SVG from the panel chrome",
+        "Avoid plain '#UpdatePanelChart' (adds padding) and '#UpdatePanelChart svg' (also matches toolbar icon SVGs)",
+        "Site uses Highcharts; chart needs ~5-8s after load to draw. Bot-detection blocks plain headless — must use realistic UA"
+      ]
+    },
+    {
+      "name": "te-eu-natural-gas",
+      "url": "https://tradingeconomics.com/commodity/eu-natural-gas",
+      "xpath": ["#UpdatePanelChart .highcharts-container"],
+      "delay_wait": 10,
+      "goal": "TradingEconomics page for European TTF natural gas commodity: ONLY the Highcharts chart (no description selector for this page).",
+      "landmarks": [
+        "Chart: ASP.NET UpdatePanel id='UpdatePanelChart' wraps a Highcharts SVG with class 'highcharts-container'"
+      ],
+      "stable_attrs": [
+        "id='UpdatePanelChart' is stable (panel wrapper)",
+        "'#UpdatePanelChart .highcharts-container' isolates the chart SVG from the panel chrome",
+        "Avoid ASP.NET-generated ids like '#ctl00_ContentPlaceHolder1_*' — they hallucinate; the page actually uses the simple 'UpdatePanelChart' alias",
+        "Site uses Highcharts; chart needs ~5-8s after load to draw. Bot-detection blocks plain headless — must use realistic UA"
+      ]
+    },
+    {
+      "name": "natgasweather-temp",
+      "url": "https://natgasweather.com/",
+      "xpath": ["//*[@id=\"post-2813\"]/div/div/section[3]/div/div[2]/div/div[2]/div/img"],
+      "delay_wait": 0,
+      "goal": "Daily US temperature anomaly map image embedded in the natgasweather homepage post.",
+      "landmarks": [
+        "WordPress post body (id like 'post-####')",
+        "An <img> with src containing today's temperature/forecast image"
+      ],
+      "stable_attrs": [
+        "Post id is volatile (changes when post is reposted); prefer matching the section heading text 'Temperature' / 'GFS' / '7-Day' and selecting the nearest <img>",
+        "img alt or src containing 'temp' / 'temperature' / 'gfs'"
+      ]
+    },
+    {
+      "name": "eia-grid-generation",
+      "url": "https://www.eia.gov/electricity/gridmonitor/dashboard/daily_generation_mix/US48/US48/",
+      "xpath": ["/html/body/div[1]/div[2]/div/app-root/app-dashboard/div/div/div/div[2]/app-grid/div[2]/div/div/gridster/gridster-item[1]/div/app-visualization"],
+      "delay_wait": 5,
+      "goal": "First panel of the EIA grid monitor 'Daily Generation Mix' dashboard — a stacked area chart of US48 generation by source.",
+      "landmarks": [
+        "Angular SPA — components have tag names like 'app-grid', 'gridster-item', 'app-visualization'",
+        "First gridster-item is the stacked-area chart in the top-left tile"
+      ],
+      "stable_attrs": [
+        "Custom Angular tags 'app-grid', 'gridster-item' are stable",
+        "Prefer 'gridster-item:first-of-type app-visualization' over deep positional path"
+      ]
+    },
+    {
+      "name": "te-gold",
+      "url": "https://tradingeconomics.com/commodity/gold",
+      "xpath": ["#description", "#UpdatePanelChart .highcharts-container"],
+      "delay_wait": 10,
+      "goal": "TradingEconomics page for Gold commodity: (1) prose description block summarizing recent price moves, (2) the Highcharts chart inside the UpdatePanel (without surrounding panel chrome).",
+      "landmarks": [
+        "Description: a prose block with id='description' under the page title",
+        "Chart: ASP.NET UpdatePanel id='UpdatePanelChart' wraps a Highcharts SVG with class 'highcharts-container'"
+      ],
+      "stable_attrs": [
+        "id='description' is stable (a paragraph block, NOT the <meta name='description'> head tag)",
+        "id='UpdatePanelChart' is stable (panel wrapper)",
+        "'#UpdatePanelChart .highcharts-container' isolates the chart SVG from the panel chrome",
+        "Avoid plain '#UpdatePanelChart' (adds padding) and '#UpdatePanelChart svg' (also matches toolbar icon SVGs)",
+        "Site uses Highcharts; chart needs ~5-8s after load to draw. Bot-detection blocks plain headless — must use realistic UA"
+      ]
+    },
+    {
+      "name": "te-us-bond-yield",
+      "url": "https://tradingeconomics.com/united-states/government-bond-yield",
+      "xpath": ["#description", "#UpdatePanelChart .highcharts-container"],
+      "delay_wait": 10,
+      "goal": "TradingEconomics page for the US 10-year government bond yield: (1) prose description block summarizing recent yield moves, (2) the Highcharts chart inside the UpdatePanel (without surrounding panel chrome).",
+      "landmarks": [
+        "Description: a prose block with id='description' under the page title",
+        "Chart: ASP.NET UpdatePanel id='UpdatePanelChart' wraps a Highcharts SVG with class 'highcharts-container'"
+      ],
+      "stable_attrs": [
+        "id='description' is stable (a paragraph block, NOT the <meta name='description'> head tag)",
+        "id='UpdatePanelChart' is stable (panel wrapper)",
+        "'#UpdatePanelChart .highcharts-container' isolates the chart SVG from the panel chrome",
+        "Avoid plain '#UpdatePanelChart' (adds padding) and '#UpdatePanelChart svg' (also matches toolbar icon SVGs)",
+        "Site uses Highcharts; chart needs ~5-8s after load to draw. Bot-detection blocks plain headless — must use realistic UA"
+      ]
+    },
+    {
+      "name": "coingecko-top",
+      "url": "https://www.coingecko.com/en/coins/bitcoin",
+      "xpath": ["[data-coin-show-target=\"staticCoinPrice\"]"],
+      "delay_wait": 4,
+      "goal": "Bitcoin detail page price card on CoinGecko — name ('Bitcoin'), symbol label ('BTC Price'), market-cap rank, current USD price, and 24h percent change. Replaced the older homepage-table approach which became Cloudflare-flaky.",
+      "landmarks": [
+        "Block on the right side of the coin detail page header showing the live price",
+        "Page is built with Stimulus.js controllers — elements use data-controller / data-*-target attributes",
+        "The same selector works on any /en/coins/<slug> page (substitute slug for ETH, etc.)"
+      ],
+      "stable_attrs": [
+        "data-coin-show-target=\"staticCoinPrice\" — Stimulus target attribute, very stable (renaming would break the JS controller)",
+        "Inner: <h1> with the coin name and a sibling span 'BTC Price' / 'ETH Price'",
+        "Tailwind class names with hash-like prefixes (tw-flex, tw-gap-x-2) are stable but generic — do NOT rely on them alone",
+        "Class names like '!tw-text-base 2lg:!tw-text-lg' have build-version suffixes baked in — avoid"
+      ]
+    }
+  ]
+}
