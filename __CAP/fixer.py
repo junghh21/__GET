@@ -108,17 +108,21 @@ def _build_prompt(target: Target, broken_selector: str, html: str) -> str:
 
 def _llm_propose(target: Target, broken_selector: str, html: str) -> Optional[str]:
 	prompt = _build_prompt(target, broken_selector, html)
-	api_key = os.environ.get("GEMINI_API_KEY")
-	if api_key:
-		out = _gemini(prompt, api_key)
-		if out:
-			return out
+	out = _gemini(prompt)
+	if out:
+		return out
 	return _g4f(prompt)
 
 
-# gemini-3.1-flash-lite-preview free tier: 15 RPM => 4s minimum spacing.
+# gemi9 (Cloudflare Pages worker) handles Gemini key rotation server-side.
+# Light client-side throttle to be polite to the worker.
+_GEMI9_DEFAULT_BASE = "https://gemi9.pages.dev"
 _GEMINI_MIN_GAP_S = 4.0
 _gemini_last_call_ts = 0.0
+
+
+def _gemi9_url():
+	return os.environ.get("GEMI9_BASE_URL", _GEMI9_DEFAULT_BASE).rstrip("/") + "/api/chat"
 
 
 def _gemini_throttle():
@@ -129,30 +133,32 @@ def _gemini_throttle():
 	_gemini_last_call_ts = time.monotonic()
 
 
-def _gemini(prompt: str, api_key: str) -> Optional[str]:
+def _gemini(prompt: str) -> Optional[str]:
 	import requests
-	endpoint = "https://generativelanguage.googleapis.com/v1beta/models/gemma-4-31b-it:generateContent"
-	body = {"contents": [{"parts": [{"text": prompt}]}]}
-	# 429 (quota burst) / 503 (overload) → back off and retry up to 3 times
-	# with progressive 15→30→60s pauses. Other failures fall through.
+	body = {"contents": [{"role": "user", "parts": [{"text": prompt}]}]}
+	# 503 (worker unified failure: quota / key fail / upstream error) → back off
+	# and retry. Other errors fall through.
+	r = None
 	for attempt, backoff in enumerate([15, 30, 60], start=1):
 		_gemini_throttle()
 		try:
-			r = requests.post(endpoint, params={"key": api_key}, json=body, timeout=60)
+			r = requests.post(_gemi9_url(), json=body, timeout=60,
+			                  headers={"content-type": "application/json"})
 		except Exception as e:
-			print(f"  gemini transport error (attempt {attempt}): {e}")
+			print(f"  gemi9 transport error (attempt {attempt}): {e}")
 			return None
-		if r.status_code not in (429, 503):
+		if r.status_code != 503:
 			break
-		print(f"  gemini http {r.status_code} (attempt {attempt}/3): backing off {backoff}s")
+		print(f"  gemi9 http 503 (attempt {attempt}/3): backing off {backoff}s")
 		time.sleep(backoff)
-	if not r.ok:
-		print(f"  gemini http {r.status_code}: {r.text[:200]}")
+	if r is None or not r.ok:
+		print(f"  gemi9 http {r.status_code if r else 'none'}: {(r.text[:200] if r else '')}")
 		return None
 	try:
-		text = r.json()["candidates"][0]["content"]["parts"][0]["text"]
+		parts = r.json()["candidates"][0]["content"]["parts"]
+		text = "".join(p.get("text", "") for p in parts)
 	except (KeyError, IndexError, ValueError) as e:
-		print(f"  gemini parse error: {e}")
+		print(f"  gemi9 parse error: {e}")
 		return None
 	return _first_selector_line(text)
 

@@ -191,11 +191,17 @@ def capture_element_screenshot(url, xpath, popup=None, popup_button=None,
 	return output
 
 
-# Gemini 2.5 flash-lite free tier nominally 15 RPM, but per-process throttle
-# can't see calls from other processes (e.g. fixer.py also throttles itself).
-# 8s sustained = 7.5 RPM, half the cap, gives headroom for transient bursts.
-_SUMMARY_GAP_S = 8.0
+# gemi9 (Cloudflare Pages worker) routes Gemini calls and rotates a key pool
+# server-side, so we don't pass keys here. See API사용법.md.
+# Throttle is light because the worker's key rotation handles per-key RPM —
+# only client-side limit on the worker URL.
+_GEMI9_DEFAULT_BASE = "https://gemi9.pages.dev"
+_SUMMARY_GAP_S = 4.0
 _summary_last_call_ts = 0.0
+
+
+def _gemi9_url():
+	return os.environ.get("GEMI9_BASE_URL", _GEMI9_DEFAULT_BASE).rstrip("/") + "/api/chat"
 
 
 def _summary_throttle():
@@ -206,45 +212,43 @@ def _summary_throttle():
 	_summary_last_call_ts = time.monotonic()
 
 
-def _gemini_summary(content, cmd):
+def _gemi9_summary(content, cmd):
 	import requests
-	api_key = os.environ.get("GEMINI_API_KEY")
-	if not api_key:
-		return ""
-	endpoint = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite-preview:generateContent"
 	prompt = (
 		(cmd or "한국어 3줄 요약")
 		+ ". 각 줄 50자 이내, 번호/불릿 없이 줄바꿈으로만 구분. 원문에 없는 사실 추가 금지.\n\n원문:\n"
 		+ content
 	)
-	body = {"contents": [{"parts": [{"text": prompt}]}]}
+	body = {"contents": [{"role": "user", "parts": [{"text": prompt}]}]}
 	r = None
 	for attempt, backoff in enumerate([15, 30, 60], start=1):
 		_summary_throttle()
 		try:
-			r = requests.post(endpoint, params={"key": api_key}, json=body, timeout=60)
+			r = requests.post(_gemi9_url(), json=body, timeout=60,
+			                  headers={"content-type": "application/json"})
 		except Exception as e:
-			print(f"  gemini summary transport error (attempt {attempt}): {e}")
+			print(f"  gemi9 summary transport error (attempt {attempt}): {e}")
 			return ""
-		if r.status_code not in (429, 503):
+		if r.status_code != 503:
 			break
-		print(f"  gemini summary http {r.status_code} (attempt {attempt}/3): backing off {backoff}s")
+		print(f"  gemi9 summary http 503 (attempt {attempt}/3): backing off {backoff}s")
 		time.sleep(backoff)
 	if r is None or not r.ok:
-		print(f"  gemini summary http {r.status_code if r else 'none'}: {(r.text[:200] if r else '')}")
+		print(f"  gemi9 summary http {r.status_code if r else 'none'}: {(r.text[:200] if r else '')}")
 		return ""
 	try:
-		return r.json()["candidates"][0]["content"]["parts"][0]["text"].strip()
+		parts = r.json()["candidates"][0]["content"]["parts"]
+		return "".join(p.get("text", "") for p in parts).strip()
 	except (KeyError, IndexError, ValueError) as e:
-		print(f"  gemini summary parse error: {e}")
+		print(f"  gemi9 summary parse error: {e}")
 		return ""
 
 
 def summary_text(content, cmd=""):
-	"""Summarize the supplied prose. Gemini if GEMINI_API_KEY is set, g4f
-	otherwise (legacy fallback). Returns "" on failure rather than raising,
-	so callers can post a header-only message."""
-	out = _gemini_summary(content, cmd)
+	"""Summarize the supplied prose via gemi9 worker (Gemini proxy with
+	server-side key rotation). g4f kept as last-resort fallback. Returns
+	"" on failure so callers can post a header-only message."""
+	out = _gemi9_summary(content, cmd)
 	if out:
 		return out
 	try:
